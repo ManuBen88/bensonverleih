@@ -1,0 +1,1344 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BensonVerleih – Event-Equipment mieten</title>
+  <meta name="description" content="Zelte, Garnituren, Stehtische, Heizstrahler, Lichterketten & mehr mieten in Lüneburg/Uelzen. Direkte Buchung über Kalender." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme:{ extend:{ colors:{ brand:{ 600:'#2563eb', 700:'#1d4ed8' } } } }, darkMode:'class' };
+  </script>
+  <style>
+    :root { --ring:#e5e7eb }
+    body{font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, sans-serif}
+    .container-tight{max-width:1100px;margin:0 auto}
+    .bg-grid{background-image:radial-gradient(rgba(0,0,0,.06) 1px,transparent 1px);background-size:18px 18px}
+    .img-fallback{background:linear-gradient(135deg,#e2e8f0,#f8fafc);display:flex;align-items:center;justify-content:center;color:#475569;font-weight:700}
+    .img-fallback span{padding:.25rem .5rem;border-radius:.5rem;background:rgba(255,255,255,.7)}
+    @media (max-width: 1023px){
+      #miniCartTopRight{bottom:1.25rem;right:1rem;left:auto;top:auto;width:auto;max-width:calc(100% - 2rem)}
+      #miniCartPanel{width:100%}
+    }
+  </style>
+</head>
+
+<body class="antialiased text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-950">
+    <header class="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60 border-b border-slate-200/60 dark:border-slate-800">
+        <div class="mx-auto container-tight px-4 py-3 flex items-center justify-between">
+            <a href="#home" class="flex items-center gap-3 font-extrabold text-lg">
+                <img src="assets/logo.png" alt="BensonVerleih" class="h-16 w-auto" onerror="this.style.display='none'">
+                <span>BensonVerleih</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+                <a href="#features" class="hover:text-brand-600">Katalog</a>
+                <a href="#contact" class="hover:text-brand-600">Buchung</a>
+              
+
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mini Anfrage‑Übersicht (fix, oben rechts) -->
+    <div id="miniCartTopRight" class="fixed right-6 top-28 z-50 w-[22rem] max-w-[90vw] flex flex-col items-end gap-2">
+        <button id="miniCartToggle" class="relative h-11 w-11 rounded-full shadow ring-1 ring-slate-200 bg-white flex items-center justify-center" title="Anfrage-Übersicht" style="position:relative">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 12.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+            <span id="cartCountBadge" style="position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#dc2626;color:#fff;font-size:11px;line-height:20px;text-align:center;font-weight:700;display:none">0</span>
+        </button>
+        <div id="miniCartPanel" class="rounded-xl shadow-lg ring-1 ring-slate-200 bg-white/95 backdrop-blur p-4 text-sm hidden">
+            <h3 class="font-semibold">Anfrage‑Übersicht</h3>
+            <ul id="miniCartList" class="mt-2 text-slate-700"><li>Noch keine Artikel ausgewählt.</li></ul>
+            <div class="mt-2"><span class="font-semibold">Geschätzter Gesamtpreis:</span> <span id="miniTotal">€0,00</span></div>
+            <div class="text-xs text-slate-500 mt-1">Unverbindliche Schätzung. Preise je nach Datum/Verfügbarkeit.</div>
+        </div>
+    </div>
+
+    <section id="home" class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-grid pointer-events-none"></div>
+        <div class="mx-auto container-tight px-4 pt-16 pb-20 md:pt-20 md:pb-28">
+            <div class="grid md:grid-cols-2 items-center gap-10">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Event‑Equipment mieten <span class="text-brand-600">für dein Fest</span></h1>
+                    <p class="mt-4 text-lg text-slate-600 dark:text-slate-300">Zelte, Bierzeltgarnituren, Stehtische, Heizstrahler, Lichterketten u.v.m. – fair, flexibel, zuverlässig.</p>
+                    <div class="mt-6 flex flex-wrap items-center gap-3">
+                        <a href="#booking" class="px-5 py-3 rounded-2xl bg-brand-600 text-white hover:bg-brand-700 shadow-sm font-semibold">Jetzt anfragen</a>
+                        <a href="#features" class="px-5 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900 font-semibold">Katalog ansehen</a>
+                    </div>
+                </div>
+                <div class="aspect-[4/3] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-hidden group">
+                    <img src="assets/hero.jpg"
+                         alt="BensonVerleih – Event-Equipment"
+                         class="w-full h-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-125 cursor-zoom-in"
+                         onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-full img-fallback',innerHTML:'<span>Hero</span>'}))" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-16 md:py-24">
+        <div class="mx-auto container-tight px-4">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-center">Katalog</h2>
+            <div class="mt-6 flex items-center justify-between gap-4">
+                <input id="catalogSearch" placeholder="Suche Artikel…" class="w-full md:w-80 rounded-xl border px-3 py-2" />
+                <select id="catalogFilter" class="rounded-xl border px-3 py-2">
+                    <option value="all">Alle Kategorien</option>
+                    <option value="zelt">Zelte</option>
+                    <option value="moebel">Garnituren & Tische</option>
+                    <option value="technik">Technik & Licht & Wärme</option>
+                    <option value="geschirr">Geschirr & Gläser</option>
+                </select>
+            </div>
+            <div id="catalogGrid" class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+    </section>
+
+
+    <section id="contact" class="py-16 md:py-24 bg-slate-50 dark:bg-slate-900/40">
+        <div class="mx-auto container-tight px-4">
+            <div class="grid lg:grid-cols-3 gap-10">
+                <div class="lg:col-span-1">
+                    <h2 class="text-3xl md:text-4xl font-extrabold">Anfrage & Verfügbarkeit</h2>
+                    <div class="mt-8 p-4 rounded-xl border text-sm bg-white/60 dark:bg-slate-900/60 lg:sticky lg:top-24">
+                        <h3 class="font-semibold mb-2">Anfrage-Übersicht</h3>
+                        <ul id="cartList" class="space-y-1 text-slate-700 dark:text-slate-300"><li>Noch keine Artikel ausgewählt.</li></ul>
+                        <div class="mt-3 text-sm"><span class="font-semibold">Geschätzter Gesamtpreis:</span> <span id="estimate">€0,00</span></div>
+                        <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">Unverbindliche Schätzung. Preise je nach Datum/Verfügbarkeit.</div>
+                    </div>
+                </div>
+
+                <!-- Netlify-Form erfasst Felder; E-Mail/Bestätigen→Kalender erfolgt via Webhook (siehe Script) -->
+                <form name="Anfrage" method="post" data-netlify="true"
+                      class="lg:col-span-2 p-6 rounded-2xl border bg-white dark:bg-slate-900 shadow-sm" id="contactForm">
+                    <input type="hidden" name="form-name" value="Anfrage" />
+                    <input type="hidden" id="cartInput" name="cart" />
+                    <input type="hidden" id="totalInput" name="total" />
+                    <input type="hidden" id="distanceKm" name="distance_km" />
+                    <input type="hidden" id="deliveryCost" name="delivery_cost" />
+                    <input type="hidden" id="serviceHidden" name="service" />
+
+                    <div class="grid md:grid-cols-2 gap-6">
+
+                        <!-- Name (zweigeteilt) -->
+                        <div class="grid grid-cols-2 gap-4 md:col-span-2">
+                            <div>
+                                <label class="block text-sm font-medium" for="firstName">Vorname</label>
+                                <input id="firstName" name="first_name" required class="mt-1 w-full rounded-xl border px-3 py-2" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium" for="lastName">Nachname</label>
+                                <input id="lastName" name="last_name" required class="mt-1 w-full rounded-xl border px-3 py-2" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium" for="email">E-Mail</label>
+                            <input id="email" name="email" type="email" required class="mt-1 w-full rounded-xl border px-3 py-2" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium" for="phone">Telefon</label>
+                            <input id="phone" name="phone" class="mt-1 w-full rounded-xl border px-3 py-2" />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium" for="fromDate">Von</label>
+                                <input id="fromDate" name="from" type="date" required class="mt-1 w-full rounded-xl border px-3 py-2" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium" for="toDate">Bis</label>
+                                <input id="toDate" name="to" type="date" required class="mt-1 w-full rounded-xl border px-3 py-2" />
+                            </div>
+                        </div>
+
+                        <!-- Service-Optionen -->
+                        <div>
+                            <label class="block text-sm font-medium" for="service">Service</label>
+                            <select id="service" class="mt-1 w-full rounded-xl border px-3 py-2">
+                                <option value="pickup">Abholung</option>
+                                <option value="delivery">Lieferung</option>
+                                <option value="all_inclusive">Lieferung und Auf-/Abbau</option>
+                            </select>
+                            <p class="mt-1 text-xs text-slate-500">Lieferung & Aufbau berechnen die Entfernung mit Google Maps.</p>
+                        </div>
+
+   
+
+                        <!-- NEU: Wunschzeiten -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium" for="fromTime">Uhrzeit (Start)</label>
+                                <input id="fromTime" name="from_time" type="time" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="z. B. 09:00" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium" for="toTime">Uhrzeit (Ende)</label>
+                                <input id="toTime" name="to_time" type="time" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="z. B. 18:00" />
+                            </div>
+                        </div>
+
+
+                        <!-- Rechnungs-/Lieferadresse -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium">Adresse</label>
+                            <div class="mt-1 grid md:grid-cols-6 gap-4">
+                                <div class="md:col-span-4">
+                                    <label class="block text-xs text-slate-500" for="street">Straße + Nr.</label>
+                                    <input id="street" name="street" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="Musterweg 12" required />
+                                </div>
+                                <div class="md:col-span-1">
+                                    <label class="block text-xs text-slate-500" for="zip">PLZ</label>
+                                    <input id="zip" name="zip" class="mt-1 w-full rounded-xl border px-3 py-2" required />
+                                </div>
+                                <div class="md:col-span-1">
+                                    <label class="block text-xs text-slate-500" for="city">Ort</label>
+                                    <input id="city" name="city" class="mt-1 w-full rounded-xl border px-3 py-2" required />
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2">Bei Lieferung dient die Adresse zur Entfernungsermittlung.</p>
+                        </div>
+
+                        <!-- Liefer-Extras (auto-berechnet mit Google Maps) -->
+                        <div id="deliveryExtras" class="md:col-span-2 hidden">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium" for="kmInput">Entfernung (km)</label>
+                                    <input id="kmInput" type="number" min="0" step="0.1" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="wird automatisch berechnet">
+                                </div>
+                                <div class="flex items-end">
+                                    <label class="inline-flex items-center gap-2 mt-1">
+                                        <input id="returnTrip" type="checkbox" class="rounded border" checked />
+                                        <span>Hin & zurück (×2)</span>
+                                    </label>
+                                </div>
+                                <div class="flex items-end text-sm text-slate-600">
+                                    Start: <strong class="ml-1">Neue Str. 2, 29553 Bienenbüttel</strong>
+                                </div>
+                            </div>
+                            <p class="mt-2 text-sm">Geschätzte Lieferkosten: <span id="deliveryEstimate">€0,00</span> <span class="text-xs text-slate-500">(0,45 €/km)</span></p>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium" for="msg">Nachricht</label>
+                            <textarea id="msg" name="message" rows="4" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="z. B. 4 Garnituren + 1 Zelt, Aufbauhilfe gewünscht"></textarea>
+                        </div>
+                    </div>
+
+                    <button class="mt-6 w-full px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 font-semibold" type="submit">Anfrage senden</button>
+                    <p class="mt-2 text-xs text-slate-500">Es handelt sich um eine unverbindliche Anfrage. Wir bestätigen per E-Mail.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="py-10">
+        <div class="mx-auto container-tight px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="text-sm text-slate-500 dark:text-slate-400">© <span id="year"></span> BensonVerleih. Alle Rechte vorbehalten.</p>
+            <nav class="flex items-center gap-4 text-sm">
+                <a href="#" id="openImpressum" class="underline decoration-dotted">Impressum</a>
+                <a href="#" id="openPrivacy" class="underline decoration-dotted">Datenschutz</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Google Maps JS (Distance Matrix) -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA763C3sIBm1eR-CZAk-Z3JQ4SaP3VQfQ8&libraries=places"></script>
+
+    <script>
+        /* ===== Globale Helfer (nur setzen, wenn noch nicht vorhanden) ===== */
+        window.EUR ??= (v => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(v || 0));
+        window.roundUp5 ??= (v => Math.ceil((v || 0) / 5) * 5);
+
+        /* ===== Lohnkosten-Konstanten (nur setzen, wenn nicht vorhanden) ===== */
+        window.LABOR_ALL_INCLUSIVE ??= 22;
+        window.LABOR_TENT_6x4 ??= 40;
+        window.LABOR_TENT_LARGE ??= 100;
+
+        /* ===== Liefer-Konstanten ===== */
+        window.RATE_PER_KM ??= 0.45;
+        window.TRIPS_FACTOR ??= 4; // 4 Fahrten
+
+   
+
+        /* ===== Anfrage-Übersicht (Sidebar) inkl. Liefer- & Lohnkosten ===== */
+        function renderSideCartExtra() {
+            const ul = document.getElementById('cartList');
+            const estEl = document.getElementById('estimate');
+            if (!ul || !estEl) return;
+
+            const { items, deposit, delivery, labor, total, showDeposit } = computeTotals();
+
+            if (!(window.cart && window.cart.size)) {
+                ul.innerHTML = '<li>Noch keine Artikel ausgewählt.</li>';
+                estEl.textContent = EUR(0);
+                return;
+            }
+
+            const rows = [];
+            // Positionen
+            (window.cart || new Map()).forEach((qty, id) => {
+                if (qty <= 0) return;
+                const it = (typeof getItem === 'function') ? getItem(id) : (window.ITEMS || []).find(x => x.id === id);
+                if (!it) return;
+                const line = linePriceFor(id, qty, (typeof rentalDays === 'function') ? rentalDays() : 1);
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+        <span>${qty}× ${it.name}</span>
+        <span>${EUR(line)}</span>
+      </li>`
+                );
+            });
+
+            // Summen
+            rows.push(
+                `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
+      <span class="font-medium">Zwischensumme</span>
+      <span class="font-medium">${EUR(items)}</span>
+    </li>`
+            );
+            if (delivery > 0) {
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+        <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+        <span>${EUR(delivery)}</span>
+      </li>`
+                );
+            }
+            if (labor > 0) {
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+        <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+        <span>${EUR(labor)}</span>
+      </li>`
+                );
+            }
+            rows.push(
+                `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
+      <span>Gesamt</span>
+      <span>${EUR(total)}</span>
+    </li>`
+            );
+
+            ul.innerHTML = rows.join('');
+            estEl.textContent = EUR(total) + (showDeposit ? ` (zzgl. Kaution ca. ${EUR(deposit)})` : '');
+        }
+
+
+
+        /* ===== Lieferung & Entfernung (Google) – sicher initialisieren ===== */
+        document.addEventListener('DOMContentLoaded', () => {
+            const ORIGIN = "Neue Str. 2, 29553 Bienenbüttel";
+
+            const serviceSel = document.getElementById('service');
+            const deliveryBox = document.getElementById('deliveryExtras');
+            const kmInput = document.getElementById('kmInput');
+            const returnTripEl = document.getElementById('returnTrip'); // optional
+            const delEstEl = document.getElementById('deliveryEstimate');
+            const hiddenService = document.getElementById('serviceHidden');
+            const hiddenKm = document.getElementById('distanceKm');
+            const hiddenCost = document.getElementById('deliveryCost');
+
+            const streetEl = document.getElementById('street');
+            const zipEl = document.getElementById('zip');
+            const cityEl = document.getElementById('city');
+
+            // Wenn die Kontakt-Section gar nicht existiert, sauber aussteigen
+            if (!serviceSel || !deliveryBox) return;
+
+            function setDeliveryCost(cost, km) {
+                const rounded = window.roundUp5(cost);
+                if (delEstEl) delEstEl.textContent = window.EUR(rounded);
+                if (hiddenCost) hiddenCost.value = String(rounded);
+                if (typeof km === 'number' && hiddenKm) hiddenKm.value = km.toFixed(1);
+            }
+
+            function recomputeFromKm() {
+                const km = Math.max(0, parseFloat(kmInput?.value || '0'));
+                const cost = km * window.RATE_PER_KM * window.TRIPS_FACTOR;
+                setDeliveryCost(cost, km);
+                updateEstimatesUI?.();
+                const deliveryNow = Number(hiddenCost?.value || 0);
+                renderSideCartExtra(deliveryNow, computeLaborCost());
+                if (typeof window.renderMini === 'function') window.renderMini();
+            }
+
+            function destAddress() {
+                return [streetEl?.value, zipEl?.value, cityEl?.value]
+                    .map(s => String(s || '').trim()).filter(Boolean).join(', ');
+            }
+
+            let debT;
+            function debounce(fn, ms = 500) { clearTimeout(debT); debT = setTimeout(fn, ms); }
+
+            function calcDistance() {
+                const val = serviceSel?.value || 'pickup';
+                if (hiddenService) hiddenService.value = val;
+
+                if (val === 'delivery' || val === 'all_inclusive') {
+                    deliveryBox.classList.remove('hidden');
+                } else {
+                    deliveryBox.classList.add('hidden');
+                    setDeliveryCost(0, 0);
+                    updateEstimatesUI?.();
+                    renderSideCartExtra(0, computeLaborCost());
+                    if (typeof window.renderMini === 'function') window.renderMini();
+                    return;
+                }
+
+                const dest = destAddress();
+                if (!dest) return;
+
+                if (!window.google || !google.maps) { setTimeout(calcDistance, 300); return; }
+
+                const svc = new google.maps.DistanceMatrixService();
+                svc.getDistanceMatrix({
+                    origins: [ORIGIN],
+                    destinations: [dest],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC
+                }, (res, status) => {
+                    if (status !== 'OK' || !res?.rows?.[0]?.elements?.[0]) return;
+                    const elem = res.rows[0].elements[0];
+                    if (elem.status !== 'OK') return;
+
+                    const km = (elem.distance.value || 0) / 1000;
+                    const cost = km * window.RATE_PER_KM * window.TRIPS_FACTOR;
+                    setDeliveryCost(cost, km);
+                    updateEstimatesUI?.();
+
+                    const deliveryNow = Number(hiddenCost?.value || 0);
+                    renderSideCartExtra(deliveryNow, computeLaborCost());
+                    if (typeof window.renderMini === 'function') window.renderMini();
+                });
+            }
+
+            function toggleExtras() {
+                const val = serviceSel?.value || 'pickup';
+                if (hiddenService) hiddenService.value = val;
+
+                if (val === 'delivery' || val === 'all_inclusive') {
+                    deliveryBox.classList.remove('hidden');
+                    calcDistance();
+                    updateEstimatesUI?.();
+                } else {
+                    deliveryBox.classList.add('hidden');
+                    setDeliveryCost(0, 0);
+                    updateEstimatesUI?.();
+                    renderSideCartExtra(0, computeLaborCost());
+                    if (typeof window.renderMini === 'function') window.renderMini();
+                }
+            }
+
+            // Events (alle mit Guards)
+            serviceSel?.addEventListener('change', toggleExtras);
+            returnTripEl?.addEventListener('change', recomputeFromKm);
+            kmInput?.addEventListener('input', recomputeFromKm);
+            [streetEl, zipEl, cityEl].forEach(el => el?.addEventListener('input', () => debounce(calcDistance, 500)));
+
+            // Init
+            toggleExtras();
+        });
+
+        function getStatusBox() {
+            let el = document.getElementById('formStatus');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'formStatus';
+                el.className = 'hidden mt-4 rounded-lg border px-4 py-3';
+                // Direkt UNTER das Formular hängen:
+                (document.getElementById('contactForm')?.parentNode || document.body).appendChild(el);
+            }
+            return el;
+        }
+
+        // FormData -> x-www-form-urlencoded (Netlify erwartet das)
+        function getStatusBox() {
+            let el = document.getElementById('formStatus');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'formStatus';
+                el.className = 'hidden mt-4 rounded-lg border px-4 py-3';
+                (document.getElementById('contactForm')?.parentNode || document.body).appendChild(el);
+            }
+            return el;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('contactForm');
+            if (!form) return;
+
+            form.addEventListener('submit', async (ev) => {
+                ev.preventDefault();
+
+                const statusEl = getStatusBox();
+                const show = (ok, msg) => {
+                    statusEl.className = 'mt-4 rounded-lg border px-4 py-3 ' +
+                        (ok ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200');
+                    statusEl.textContent = msg;
+                    statusEl.classList.remove('hidden');
+                    statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                };
+
+                // 1) Warenkorb & Summen in Hidden-Felder schreiben
+                const obj = {}; let sumItems = 0;
+                (window.cart || new Map()).forEach((qty, id) => {
+                    if (qty > 0) {
+                        obj[id] = qty;
+                        const it = (window.ITEMS || []).find(x => x.id === id);
+                        if (it) sumItems += (it.day || 0) * qty; // falls du eine eigene Preisfunktion hast, hier einsetzen
+                    }
+                });
+                document.getElementById('cartInput')?.setAttribute('value', JSON.stringify(obj));
+
+                const delivery = Number(document.getElementById('deliveryCost')?.value || 0);
+                const labor = (typeof computeLaborCost === 'function') ? computeLaborCost() : 0;
+                document.getElementById('totalInput')?.setAttribute('value', String(sumItems + delivery + labor));
+                document.getElementById('serviceHidden')?.setAttribute('value', document.getElementById('service')?.value || 'pickup');
+
+                // 2) Jetzt an dein Apps Script schicken (läuft lokal & online)
+                const fd = new FormData(form);
+
+                // UI sperren
+                const btn = form.querySelector('button[type="submit"]');
+                const prev = btn?.textContent;
+                if (btn) { btn.disabled = true; btn.textContent = 'Sende…'; }
+
+                try {
+                    // Wichtig: mode:'no-cors' vermeidet CORS-Ärger; Antwort kann nicht gelesen werden,
+                    // aber das Script bekommt die Daten und sendet dir die E-Mail.
+                    fetch('https://script.google.com/macros/s/AKfycbyuhKF2JpLYQSScSlB1DrlXL5WfEZnohxUTsNPKwoth0NbsFdnQqlmXGMlGKy0lw18UtQ/exec', { method: 'POST', body: fd, mode: 'no-cors' });
+
+                    // Optional: Du KANNST zusätzlich Netlify Forms posten, wenn du später umstellst:
+                    // await fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+                    //   body: new URLSearchParams(Object.fromEntries(fd)) });
+
+                    show(true, 'Danke! Deine Anfrage wurde erfolgreich versendet.');
+                    form.reset();
+                    if (window.cart?.clear) window.cart.clear();
+                    // UI aktualisieren, falls vorhanden
+                    window.renderMainList?.();
+                    window.renderMiniList?.();
+                    window.updateEstimatesUI?.();
+                    window.renderSideCartExtra?.(
+                        Number(document.getElementById('deliveryCost')?.value || 0),
+                        (typeof computeLaborCost === 'function') ? computeLaborCost() : 0
+                    );
+                } catch (err) {
+                    console.error(err);
+                    show(false, 'Senden fehlgeschlagen. Bitte später erneut versuchen.');
+                } finally {
+                    if (btn) { btn.disabled = false; btn.textContent = prev || 'Anfrage senden'; }
+                }
+            });
+        });
+
+    </script>
+
+
+    <script>
+        function updateQuotePanels() {
+            // Falls du eine Sidebar-Funktion hast:
+            if (typeof renderMainList === 'function') renderMainList();      // listet Positionen inkl. Liefer-/Lohnkosten
+            if (typeof renderMiniList === 'function') renderMiniList();      // Mini oben rechts inkl. Liefer-/Lohnkosten
+            if (typeof updateEstimatesUI === 'function') updateEstimatesUI();// aktualisiert Total/Hidden totalInput
+            // Optional extra: falls du eine spezielle Sidebar-Renderer-Funktion hast:
+            const deliveryNow = getDeliveryNow();
+            const laborNow = (typeof computeLaborCost === 'function') ? computeLaborCost() : 0;
+            if (typeof renderSideCartExtra === 'function') renderSideCartExtra(deliveryNow, laborNow);
+        }
+
+        // Service-Change-Listener (Pickup/Lieferung/All inclusive)
+        (function bindServiceChange() {
+            const serviceSel = document.getElementById('service');
+            const deliveryBox = document.getElementById('deliveryExtras');
+            if (!serviceSel) return;
+
+            serviceSel.addEventListener('change', () => {
+                const v = serviceSel.value;
+                // Hidden Feld spiegeln
+                const hiddenService = document.getElementById('serviceHidden');
+                if (hiddenService) hiddenService.value = v;
+
+                if (v === 'delivery' || v === 'all_inclusive') {
+                    // Liefer-Extras zeigen und Entfernung neu berechnen (falls Funktion vorhanden)
+                    deliveryBox?.classList.remove('hidden');
+                    if (typeof calcDistance === 'function') {
+                        calcDistance(); // setzt deliveryCost & deliveryEstimate
+                        updateEstimatesUI?.();
+                    } else {
+                        updateQuotePanels(); // fallback
+                    }
+                } else {
+                    // Pickup: Liefer-Extras verstecken und Kosten auf 0
+                    deliveryBox?.classList.add('hidden');
+                    const costEl = document.getElementById('deliveryCost');
+                    const estEl = document.getElementById('deliveryEstimate');
+                    if (costEl) costEl.value = '0';
+                    if (estEl) estEl.textContent = EUR(0);
+                    updateQuotePanels();
+                }
+            });
+        })();
+
+
+        function renderSideCartExtra(deliveryRaw, laborRaw) {
+            const ul = document.getElementById('cartList');
+            const estEl = document.getElementById('estimate');
+            if (!ul || !estEl) return;
+
+            // --- Konsistente Grundlagen ---
+            const days = (typeof rentalDays === 'function') ? rentalDays() : 1;
+            const round5 = (typeof roundUp5 === 'function') ? roundUp5 : (v => v);
+            const svc = (document.getElementById('serviceHidden')?.value || document.getElementById('service')?.value || 'pickup').toLowerCase();
+
+            // --- Positionen rechnen (inkl. 3-Tage-Regel, falls vorhanden) ---
+            let sumItems = 0;
+            let depositSum = 0;
+            const rows = [];
+
+            if (!(window.cart && window.cart.size)) {
+                ul.innerHTML = '<li>Noch keine Artikel ausgewählt.</li>';
+                estEl.textContent = EUR(0);
+                // Mini-Panel trotzdem synchron halten
+                const mini = document.getElementById('miniTotal');
+                if (mini) mini.textContent = EUR(0);
+                return;
+            }
+
+            window.cart.forEach((qty, id) => {
+                if (qty <= 0) return;
+                const it = (window.ITEMS || []).find(x => x.id === id) || { name: id, day: 0, deposit: 0 };
+
+                const line = (typeof linePriceFor === 'function')
+                    ? linePriceFor(id, qty, days)   // deine 3-Tage-Pauschale etc.
+                    : (Number(it.day) || 0) * qty * days;
+
+                sumItems += line;
+                depositSum += (Number(it.deposit) || 0) * qty;
+
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+        <span>${qty}× ${it.name}</span>
+        <span>${EUR(line)}</span>
+      </li>`
+                );
+            });
+
+            // --- Zuschläge konsistent runden/verwenden ---
+            const delivery = round5(Number(deliveryRaw || 0));
+            const labor = Number(laborRaw || 0);
+
+            // --- Zwischensumme + Zuschläge + Gesamt ---
+            rows.push(
+                `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
+      <span class="font-medium">Zwischensumme</span>
+      <span class="font-medium">${EUR(sumItems)}</span>
+    </li>`
+            );
+
+            if (delivery > 0) {
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+        <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+        <span>${EUR(delivery)}</span>
+      </li>`
+                );
+            }
+
+            if (labor > 0) {
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+        <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+        <span>${EUR(labor)}</span>
+      </li>`
+                );
+            }
+
+            const total = sumItems + delivery + labor;
+
+            rows.push(
+                `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
+      <span>Gesamt</span>
+      <span>${EUR(total)}</span>
+    </li>`
+            );
+
+            ul.innerHTML = rows.join('');
+
+            // --- Anzeige „Geschätzter Gesamtpreis“: exakt derselbe total + Kaution nur bei Abholung ---
+            const showDeposit = (svc === 'pickup') && depositSum > 0;
+            estEl.textContent = EUR(total) + (showDeposit ? (' (zzgl. Kaution ca. ' + EUR(depositSum) + ')') : '');
+
+            // (optional) Mini-Panel absolut synchron halten:
+            const mini = document.getElementById('miniTotal');
+            if (mini) mini.textContent = EUR(total) + (showDeposit ? (' (zzgl. Kaution ca. ' + EUR(depositSum) + ')') : '');
+        }
+
+
+
+        function computeLaborCost() {
+            // nur bei All inclusive
+            const service = (document.getElementById('serviceHidden')?.value || document.getElementById('service')?.value || '').toLowerCase();
+            if (service !== 'all_inclusive') return 0;
+
+            let labor = 5; // Grundpauschale (dein aktueller Wert)
+
+            // WICHTIG: exakt dieselbe Instanz wie oben verwenden (nicht window.cart || new Map())
+            cart.forEach((qty, id) => {
+                if (qty <= 0) return;
+                if (id === 'zelt_4x6') labor += 40 * qty; // kleines Zelt
+                if (id === 'zelt_4x12') labor += 100 * qty; // großes Zelt
+            });
+
+            return labor;
+        }
+
+
+
+
+        (function () {
+            const ORIGIN = "Neue Str. 2, 29553 Bienenbüttel";
+            const RATE_PER_KM = 0.45;
+
+            const serviceSel = document.getElementById('service');
+            const deliveryBox = document.getElementById('deliveryExtras');
+            const kmInput = document.getElementById('kmInput');
+            const returnTripEl = document.getElementById('returnTrip');
+            const delEstEl = document.getElementById('deliveryEstimate');
+
+            const addrEls = ['street', 'zip', 'city'].map(id => document.getElementById(id));
+            // Neu:
+            const TRIPS_FACTOR = 4; // 4 Fahrten: hin + zurück + hin + zurück
+            const roundUp5 = v => Math.ceil((v || 0) / 5) * 5;
+            const EUR = v => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(v || 0);
+
+
+            // Show/Hide extras
+            function toggleExtras() {
+                const val = serviceSel.value;
+                document.getElementById('serviceHidden').value = val;
+                if (val === 'delivery' || val === 'all_inclusive') {
+                    deliveryBox.classList.remove('hidden');
+                    calcDistance(); // try to auto-calc
+                    updateEstimatesUI?.();
+                } else {
+                    deliveryBox.classList.add('hidden');
+                    setDeliveryCost(0);
+                    updateEstimatesUI?.();
+                }
+            }
+
+            // Set cost display + hidden fields
+            function setDeliveryCost(cost, km) {
+                const rounded = roundUp5(cost);           // auf 5 € runden (aufwärts)
+                delEstEl.textContent = EUR(rounded);
+                document.getElementById('deliveryCost').value = String(rounded);
+                if (typeof km === 'number') {
+                    // km weiter intern speichern, aber nicht zwingend anzeigen
+                    document.getElementById('distanceKm').value = km.toFixed(1);
+                    // Wenn du km NICHT anzeigen willst: einfach auskommentieren
+                    // kmInput.value = km.toFixed(1);
+                }
+            }
+
+
+            // Compute cost from current kmInput & returnTrip
+            function recomputeFromKm() {
+                const km = Math.max(0, parseFloat(kmInput.value || '0'));
+                const cost = km * RATE_PER_KM * TRIPS_FACTOR;
+                setDeliveryCost(cost, km);
+            }
+
+
+            // Debounce helper
+            let t = null;
+            function debounce(fn, ms) { clearTimeout(t); t = setTimeout(fn, ms); }
+
+            // Google Distance Matrix
+            function calcDistance() {
+                if (!window.google || !google.maps) return; // API not loaded
+                const dest = [document.getElementById('street').value, document.getElementById('zip').value, document.getElementById('city').value]
+                    .map(s => String(s || '').trim()).filter(Boolean).join(', ');
+                if (!dest) return;
+
+                const svc = new google.maps.DistanceMatrixService();
+                svc.getDistanceMatrix({
+                    origins: [ORIGIN],
+                    destinations: [dest],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC
+                }, (res, status) => {
+                    if (status !== 'OK' || !res?.rows?.[0]?.elements?.[0]) { return; }
+                    const elem = res.rows[0].elements[0];
+                    if (elem.status !== 'OK') return;
+                    const km = (elem.distance.value || 0) / 1000; // meters → km
+                    const cost = km * RATE_PER_KM * TRIPS_FACTOR;
+                    setDeliveryCost(cost, km);
+                    if (typeof syncAll === 'function') syncAll();
+                    else {
+                        renderMainList();
+                        renderMiniList?.();
+                        updateEstimatesUI?.();
+                    }
+                });
+            }
+
+            // Events
+            serviceSel.addEventListener('change', toggleExtras);
+            returnTripEl.addEventListener('change', recomputeFromKm);
+            kmInput.addEventListener('input', recomputeFromKm);
+            addrEls.forEach(el => el.addEventListener('input', () => debounce(calcDistance, 500)));
+
+            // Init
+            toggleExtras();
+
+            /* ===== Submit (Netlify + Webhook für E-Mail & Kalender) =====
+               – Netlify erfasst das Formular (data-netlify="true") – richte E-Mail Benachrichtigungen an
+                 "manuel.benson@gmail.com" in Netlify ein.
+               – Für die „Bestätigen“-Mail + Kalender-Eintrag nutze einen Webhook (z. B. Google Apps Script)
+                 und trage die URL unten ein. Der Hook sendet die Mail mit Bestätigungslink; der Link ruft
+                 denselben Hook mit ?confirm=… auf und trägt in Google Calendar ein. */
+
+            // Hilfsfunktion: FormData → x-www-form-urlencoded (für Netlify)
+            function encodeForm(fd) {
+                const params = new URLSearchParams();
+                // wichtig: form-name muss mit drin sein
+                if (!fd.get('form-name')) params.set('form-name', 'Anfrage');
+                for (const [k, v] of fd.entries()) params.append(k, v);
+                return params.toString();
+            }
+
+            const form = document.getElementById('contactForm');
+            const statusEl = document.getElementById('formStatus');
+
+        
+ 
+
+        })();
+    </script>
+
+
+    <script>
+        /* === Kalender-Logik (Monatsansicht + Bereich wählen + ins Formular übernehmen) === */
+        let calCursor = new Date(); calCursor.setDate(1);
+        let selStart = null, selEnd = null;
+
+        const calMonthEl = document.getElementById('calMonth');
+        const calGridEl = document.getElementById('calGrid');
+
+        function renderCalendar() {
+            if (!calGridEl) return;
+
+            const y = calCursor.getFullYear();
+            const m = calCursor.getMonth(); // 0..11
+            calMonthEl.textContent = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calCursor);
+
+            calGridEl.innerHTML = '';
+
+            // Wochenstart Montag
+            const first = new Date(y, m, 1);
+            const startSun0 = first.getDay();      // 0=So ... 6=Sa
+            const startIdx = (startSun0 + 6) % 7; // 0=Mo ... 6=So
+            const daysInMon = new Date(y, m + 1, 0).getDate();
+
+            // Einrückung für den ersten Wochentag
+            for (let i = 0; i < startIdx; i++) calGridEl.appendChild(document.createElement('div'));
+
+            for (let d = 1; d <= daysInMon; d++) {
+                const date = new Date(y, m, d);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = String(d);
+                btn.className = 'px-2 py-2 rounded-lg text-sm hover:bg-slate-100 border';
+                btn.dataset.date = date.toISOString().slice(0, 10);
+
+                const sameDay = (a, b) => a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+                const inRange = selStart && selEnd && date >= selStart && date <= selEnd;
+                const isEdge = sameDay(date, selStart) || sameDay(date, selEnd);
+                if (inRange) btn.classList.add('bg-blue-50', 'border-blue-200');
+                if (isEdge) btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+
+                btn.addEventListener('click', () => {
+                    if (!selStart || (selStart && selEnd)) { selStart = new Date(y, m, d); selEnd = null; }
+                    else {
+                        const pick = new Date(y, m, d);
+                        if (pick < selStart) { selEnd = selStart; selStart = pick; } else { selEnd = pick; }
+                    }
+                    document.getElementById('selFrom').textContent = selStart ? selStart.toLocaleDateString('de-DE') : '–';
+                    document.getElementById('selTo').textContent = selEnd ? selEnd.toLocaleDateString('de-DE') : '–';
+                    renderCalendar();
+                });
+
+                calGridEl.appendChild(btn);
+            }
+        }
+
+        // Monatsnavigation
+        document.getElementById('calPrev')?.addEventListener('click', () => { calCursor.setMonth(calCursor.getMonth() - 1); renderCalendar(); });
+        document.getElementById('calNext')?.addEventListener('click', () => { calCursor.setMonth(calCursor.getMonth() + 1); renderCalendar(); });
+
+        // Auswahl ins Formular übernehmen (passe ggf. IDs deiner Inputs an)
+        document.getElementById('applyRangeBtn')?.addEventListener('click', () => {
+            if (!selStart || !selEnd) return;
+            const from = selStart.toISOString().slice(0, 10);
+            const to = selEnd.toISOString().slice(0, 10);
+            document.getElementById('fromDate')?.setAttribute('value', from);
+            document.getElementById('toDate')?.setAttribute('value', to);
+        });
+
+        // Auswahl zurücksetzen
+        document.getElementById('clearRangeBtn')?.addEventListener('click', () => {
+            selStart = selEnd = null;
+            document.getElementById('selFrom').textContent = '–';
+            document.getElementById('selTo').textContent = '–';
+            renderCalendar();
+        });
+
+        // initial anzeigen
+        renderCalendar();
+    </script>
+
+
+    <script>
+        // Theme toggle
+        const $ = (s) => document.querySelector(s); const $$ = (s) => Array.from(document.querySelectorAll(s));
+        function setTheme(d) { const c = document.documentElement.classList; d ? c.add('dark') : c.remove('dark'); localStorage.setItem('theme', d ? 'dark' : 'light'); }
+        setTheme((localStorage.getItem('theme') || '') === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches);
+        $('#themeToggle')?.addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
+        $('#year').textContent = new Date().getFullYear();
+    </script>
+
+    <script>
+        "use strict";
+        // === Produktdaten + schneller Index ===
+        window.ITEMS = [
+            { id: 'zelt_4x6', cat: 'zelt', name: 'Party-Zelt 4×6 m', price3: 30, day: 30, weekend: 35, deposit: 100, img: 'assets/zelt-klein.jpg', desc: 'Seitenwände inkl.' },
+            { id: 'zelt_4x12', cat: 'zelt', name: 'Party-Zelt 4×12 m', price3: 85, day: 85, weekend: 100, deposit: 150, img: 'assets/hero.jpg', desc: 'Großes Zelt, Seitenwände inkl.' },
+            { id: 'set_biergarnitur', cat: 'moebel', name: 'Bierzeltgarnitur (Tisch 220×70 + 2 Bänke)', price3: 10, day: 10, weekend: 12, deposit: 30, img: 'assets/biergarnitur.jpg', desc: 'Für 6–8 Personen.' },
+            { id: 'stehtisch', cat: 'moebel', name: 'Stehtisch Ø70 cm', price3: 5, day: 5, weekend: 7, deposit: 50, img: 'assets/stehtisch.jpg', desc: 'Klapptisch, Husse optional.' },
+            { id: 'lichterkette', cat: 'technik', name: 'Lichterkette 10 m (LED)', price3: 8, day: 8, weekend: 18, deposit: 20, img: 'assets/lichtkette.jpg', desc: 'Warmweiß, erweiterbar.' },
+            { id: 'teller_set', cat: 'geschirr', name: 'Teller-Set (10 Stk.)', price3: 5, day: 5, weekend: 10, deposit: 15, img: 'assets/teller.jpg', desc: 'Porzellan.' },
+            { id: 'glaeser_set', cat: 'geschirr', name: 'Gläser-Set (12 Stk.)', price3: 5, day: 5, weekend: 10, deposit: 15, img: 'assets/glaeser.jpg', desc: 'Universal.' },
+            { id: 'husseBier', cat: 'Deko', name: 'Bierbank-Husse inklusive Reinigung', price3: 5, day: 5, weekend: 10, deposit: 5, img: 'assets/bhusse.jpg', desc: 'Universal.' },
+            { id: 'husseSteh', cat: 'Deko', name: 'Stehtisch-Husse inklusive Reinigung', price3: 5, day: 5, weekend: 10, deposit: 5, img: 'assets/shusse.jpg', desc: 'Universal.' }
+        ];
+
+
+        let CATALOG_INDEX = {};
+        function rebuildIndex() { CATALOG_INDEX = {}; (window.ITEMS || []).forEach(it => { if (it && it.id) CATALOG_INDEX[it.id] = it; }); }
+        function getItem(id) { return CATALOG_INDEX[id] || null; }
+        rebuildIndex();
+
+        // === Katalog rendern ===
+        const catalogGrid = document.getElementById('catalogGrid');
+        function money(n) { return '€' + (Number(n) || 0).toFixed(2).replace('.', ','); }
+        function cardImageHTML(item) {
+            const alt = item.name || 'Artikel';
+            if (item.img) {
+                return `<img src="${item.img}" alt="${alt}" class="w-full h-40 object-cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-40 img-fallback',innerHTML:'<span>${alt}</span>'}))">`;
+            }
+            return `<div class="w-full h-40 img-fallback"><span>${alt}</span></div>`;
+        }
+
+        function renderCatalog() {
+            const q = (document.getElementById('catalogSearch')?.value || '').toLowerCase();
+            const cat = document.getElementById('catalogFilter')?.value || 'all';
+            const filtered = (window.ITEMS || []).filter(it => {
+                const inCat = cat === 'all' || it.cat === cat;
+                const txt = (it.name + ' ' + (it.desc || '')).toLowerCase();
+                const inTxt = !q || txt.includes(q);
+                return inCat && inTxt;
+            });
+            catalogGrid.innerHTML = filtered.map(item => `
+          <div class="p-0 rounded-2xl border bg-white/60 dark:bg-slate-900/60 flex flex-col overflow-hidden">
+            ${cardImageHTML(item)}
+            <div class="p-6 flex-1">
+              <div class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">${item.cat}</div>
+              <h3 class="font-semibold text-lg mt-1">${item.name}</h3>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">${item.desc || ''}</p>
+              <div class="mt-2 text-sm text-slate-600 dark:text-slate-300"><span class="font-semibold">${money(item.price3 ?? item.day)}</span>/3 Tage · Kaution ca. ${money(item.deposit)}</div>
+              <div class="mt-4 flex items-center gap-3">
+                <input type="number" min="1" value="1" class="w-20 rounded-xl border px-3 py-2" aria-label="Menge" />
+                <button type="button" class="px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 font-semibold addBtn" data-id="${item.id}">Hinzufügen</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        }
+        renderCatalog();
+        document.getElementById('catalogSearch')?.addEventListener('input', renderCatalog);
+        document.getElementById('catalogFilter')?.addEventListener('change', renderCatalog);
+
+        // === Warenkorb & Berechnung ===
+        const cart = (window.cart ||= new Map());
+        const EUR = n => '€' + (Number(n) || 0).toFixed(2).replace('.', ',');
+        function parseDate(id) { const el = document.getElementById(id); if (!el || !el.value) return null; const d = new Date(el.value + 'T00:00:00'); return isNaN(d) ? null : d; }
+        function rentalDays() { const a = parseDate('fromDate'), b = parseDate('toDate'); if (!a || !b) return 1; const ms = b - a; if (ms < 0) return 1; return Math.max(1, Math.floor(ms / 86400000) + 1); }
+        // ---------------------------------------------------------- Einstellen ----------------------------------------------------------
+        const FLAT3_IDS = new Set(['zelt_4x6', 'zelt_4x12', 'set_biergarnitur', 'stehtisch','lichterkette']);
+        // ---------------------------------------------------------- Einstellen ----------------------------------------------------------
+
+
+        // === 3-Tage-Pakete ===
+        const BUNDLE_DAYS = 3;
+        function pricePerBundle(it) { return Number((it && (it.price3 ?? it.day)) || 0); }
+        function linePriceFor(id, qty, realDays) {
+            const it = (typeof getItem === 'function') ? getItem(id) : (window.ITEMS || []).find(x => x.id === id);
+            if (!it) return 0;
+            const d = Math.max(1, realDays || 1);
+            const bundles = Math.ceil(d / BUNDLE_DAYS); // 1–3 Tage=1, 4–6=2, ...
+            return pricePerBundle(it) * (qty || 0) * bundles;
+        }
+
+        // === Totals für alles (Liste, Mini, Hidden) ===
+        function computeTotals() {
+            const cart = window.cart || new Map();
+            const days = (typeof rentalDays === 'function') ? rentalDays() : 1;
+
+            let items = 0, deposit = 0;
+            cart.forEach((qty, id) => {
+                if (qty <= 0) return;
+                const it = (typeof getItem === 'function') ? getItem(id) : (window.ITEMS || []).find(x => x.id === id);
+                if (!it) return;
+                items += linePriceFor(id, qty, days);
+                deposit += (Number(it.deposit) || 0) * qty;
+            });
+
+            const delivery = (typeof getDeliveryNow === 'function')
+                ? getDeliveryNow()
+                : Number(document.getElementById('deliveryCost')?.value || 0);
+
+            const labor = (typeof computeLaborCost === 'function') ? computeLaborCost() : 0;
+
+            const total = items + delivery + labor;
+            const svc = (document.getElementById('serviceHidden')?.value || document.getElementById('service')?.value || 'pickup').toLowerCase();
+            const showDeposit = (svc === 'pickup') && deposit > 0;
+
+            return { items, deposit, delivery, labor, total, days, showDeposit };
+        }
+
+
+        function deliveryCost() { const mode = document.getElementById('delivery')?.value || 'pickup'; if (mode !== 'delivery') return 0; const km = parseFloat(document.getElementById('kmInput')?.value || '0') || 0; const back = document.getElementById('returnTrip')?.checked ? 2 : 1; return km * 0.45 * back; }
+
+        function renderMiniList() {
+            const ul = document.getElementById('miniCartList');
+            const mini = document.getElementById('miniTotal');
+            if (!ul || !mini) return;
+
+            const { items, deposit, delivery, labor, total, showDeposit } = computeTotals();
+
+            if (!(window.cart && window.cart.size)) {
+                ul.innerHTML = '<li>Noch keine Artikel ausgewählt.</li>';
+                mini.textContent = EUR(0);
+                return;
+            }
+
+            const days = (typeof rentalDays === 'function') ? rentalDays() : 1;
+            const rows = [];
+
+            (window.cart || new Map()).forEach((qty, id) => {
+                if (qty <= 0) return;
+                const it = (typeof getItem === 'function') ? getItem(id) : (window.ITEMS || []).find(x => x.id === id);
+                if (!it) return;
+                const line = linePriceFor(id, qty, days);
+                rows.push(
+                    `<li class="py-2 flex items-center gap-3" data-id="${id}" data-qty="${qty}">
+        <div class="flex-1">
+          <div class="font-medium leading-tight">${it.name}</div>
+          <div class="text-xs text-slate-500">${qty}× ${EUR(pricePerBundle(it))} /3 Tage × ${Math.ceil(Math.max(1, days) / 3)} Pakete = <strong>${EUR(line)}</strong></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="px-2 py-1 rounded border" data-dec="${id}">−</button>
+          <input type="number" min="0" class="w-16 rounded border px-2 py-1 qty" value="${qty}" data-q="${id}">
+          <button class="px-2 py-1 rounded border" data-inc="${id}">+</button>
+          <button class="px-2 py-1 rounded border text-red-600" data-del="${id}">×</button>
+        </div>
+      </li>`
+                );
+            });
+
+            // Summen
+            rows.push(
+                `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
+      <span class="font-medium">Zwischensumme</span>
+      <span class="font-medium">${EUR(items)}</span>
+    </li>`
+            );
+            if (delivery > 0) {
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+        <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+        <span>${EUR(delivery)}</span>
+      </li>`
+                );
+            }
+            if (labor > 0) {
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+        <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+        <span>${EUR(labor)}</span>
+      </li>`
+                );
+            }
+            rows.push(
+                `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
+      <span>Gesamt</span>
+      <span>${EUR(total)}</span>
+    </li>`
+            );
+
+            ul.innerHTML = rows.join('');
+            mini.textContent = EUR(total) + (showDeposit ? ` (zzgl. Kaution ca. ${EUR(deposit)})` : '');
+
+            // Controls re-binden
+            ul.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => changeQty(b.dataset.dec, (window.cart.get(b.dataset.dec) || 0) - 1));
+            ul.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => changeQty(b.dataset.inc, (window.cart.get(b.dataset.inc) || 0) + 1));
+            ul.querySelectorAll('[data-del]').forEach(b => b.onclick = () => changeQty(b.dataset.del, 0));
+            ul.querySelectorAll('[data-q]').forEach(inp => inp.onchange = () => changeQty(inp.dataset.q, parseInt(inp.value || '0', 10) || 0));
+        }
+
+
+        // Helper: nimmt die (schon gerundeten) Lieferkosten aus dem Hidden-Feld.
+        // Wenn roundUp5 schon woanders angewendet wurde, ist das idempotent.
+        function getDeliveryNow() {
+            const raw = Number(document.getElementById('deliveryCost')?.value || 0);
+            return (typeof roundUp5 === 'function') ? roundUp5(raw) : raw;
+        }
+
+        // Sidebar-Liste inkl. Liefer- & Lohnkosten + Gesamt
+        function renderMainList() {
+            const list = document.getElementById('cartList');
+            if (!list) return;
+
+            if (!cart || cart.size === 0) {
+                list.innerHTML = '<li>Noch keine Artikel ausgewählt.</li>';
+                return;
+            }
+
+            const days = (typeof rentalDays === 'function') ? rentalDays() : 1;
+
+            let sumItems = 0;
+            const rows = [];
+
+            cart.forEach((qty, id) => {
+                if (qty > 0) {
+                    const p = (typeof getItem === 'function') ? getItem(id) : (window.ITEMS || []).find(x => x.id === id);
+                    if (!p) return;
+                    const line = linePriceFor(id, qty, days);
+                    sumItems += line;
+                    const note = FLAT3_IDS.has(id) && days <= 3
+                        ? ' <span class="text-xs text-slate-500">(3-Tage-Pauschale)</span>'
+                        : (FLAT3_IDS.has(id) && days > 3 ? ' <span class="text-xs text-slate-500">(30 €/3T + Rest normal)</span>' : '');
+                    rows.push(
+                        `<li class="flex items-center justify-between gap-2">
+         <span>${qty}× ${p.name}${note}</span>
+         <span>${EUR(line)}</span>
+       </li>`
+                    );
+                }
+            });
+
+
+
+            // Zwischensumme (Artikel)
+            rows.push(
+                `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
+       <span class="font-medium">Zwischensumme</span>
+       <span class="font-medium">${EUR(sumItems)}</span>
+     </li>`
+            );
+
+            // Liefer- & Lohnkosten
+            const delivery = getDeliveryNow();
+            if (delivery > 0) {
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+         <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+         <span>${EUR(delivery)}</span>
+       </li>`
+                );
+            }
+            const labor = computeLaborCost();
+            if (labor > 0) {
+                rows.push(
+                    `<li class="flex items-center justify-between gap-2">
+         <span>Lohnkosten <span class="text-xs text-slate-500">(Lieferung und Auf-/Abbau)</span></span>
+         <span>${EUR(labor)}</span>
+       </li>`
+                );
+            }
+
+            // Gesamt
+            const total = sumItems + delivery + labor;
+            rows.push(
+                `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
+       <span>Gesamt</span>
+       <span>${EUR(total)}</span>
+     </li>`
+            );
+
+            list.innerHTML = rows.join('');
+        }
+
+
+
+        function updateHiddenInputs() {
+            const payload = Array.from(cart.entries()).map(([id, qty]) => ({ id, qty }));
+            document.getElementById('cartInput')?.setAttribute('value', JSON.stringify(payload));
+        }
+
+        function updateBadge() {
+            const badge = document.getElementById('cartCountBadge');
+            const n = cart.size;
+            if (n > 0) { badge.textContent = n; badge.style.display = 'inline-block'; }
+            else { badge.textContent = '0'; badge.style.display = 'none'; }
+            const btn = document.getElementById('miniCartToggle'); if (btn) btn.setAttribute('aria-label', 'Warenkorb (' + n + ')');
+        }
+
+        function sumCartItems() {
+            const days = rentalDays();
+            let items = 0, deposit = 0;
+            for (const [id, qty] of cart.entries()) {
+                const it = getItem(id);
+                if (!it) continue;
+                items += linePriceFor(id, qty, Number(it.day), days);
+                deposit += (Number(it.deposit) || 0) * (qty || 0);
+            }
+            return { items, deposit, days };
+        }
+
+
+        // Nimmt die bereits gerundeten Lieferkosten aus dem Hidden-Feld (id="deliveryCost")
+        // und rundet zur Sicherheit nochmal auf 5 € (idempotent, falls roundUp5 schon angewendet wurde).
+        function getDeliveryNow() {
+            const raw = Number(document.getElementById('deliveryCost')?.value || 0);
+            return (typeof roundUp5 === 'function') ? roundUp5(raw) : raw;
+        }
+
+        function currentService() {
+            const h = document.getElementById('serviceHidden')?.value?.toLowerCase().trim();
+            if (h) return h;
+            return (document.getElementById('service')?.value || 'pickup').toLowerCase().trim();
+        }
+        function isPickup() { return currentService() === 'pickup'; }
+
+        function updateEstimatesUI() {
+            // Nur Hidden-Feld aktualisieren; Anzeige macht renderSideCartExtra()
+            const { total } = computeTotals();
+            document.getElementById('totalInput')?.setAttribute('value', String(total));
+        }
+
+
+        /*
+        function updateEstimatesUI() {
+            const { items, deposit } = sumCartItems();
+            const delivery = getDeliveryNow();
+            const labor = (typeof computeLaborCost === 'function') ? computeLaborCost() : 0;
+            const total = items + delivery + labor;
+
+            const showDeposit = isPickup() && deposit > 0;
+
+            const mini = document.getElementById('miniTotal');
+            if (mini) mini.textContent = EUR(total) + (showDeposit ? (' (zzgl. Kaution ca. ' + EUR(deposit) + ')') : '');
+
+            const sideEst = document.getElementById('estimate');
+            if (sideEst) sideEst.textContent = EUR(total) + (showDeposit ? (' (zzgl. Kaution ca. ' + EUR(deposit) + ')') : '');
+
+            document.getElementById('totalInput')?.setAttribute('value', String(total));
+        } */
+
+
+
+
+        function changeQty(id, next) {
+            next = Math.max(0, next | 0);
+            if (next === 0) cart.delete(id); else cart.set(id, next);
+            syncAll();
+        }
+        function addToCart(id, qty) {
+            cart.set(id, (cart.get(id) || 0) + qty);
+            syncAll();
+        }
+        function syncAll() {
+            renderMiniList();
+            // NEU: SideCart mit korrekten Zusatzkosten rendern:
+            const deliveryNow = (typeof getDeliveryNow === 'function') ? getDeliveryNow() : Number(document.getElementById('deliveryCost')?.value || 0);
+            const laborNow = (typeof computeLaborCost === 'function') ? computeLaborCost() : 0;
+            renderSideCartExtra(deliveryNow, laborNow);
+
+            updateHiddenInputs();
+            updateBadge();
+            updateEstimatesUI(); // darf #estimate NICHT anders setzen als oben – sonst weglassen!
+        }
+
+
+        // Globaler Add-Handler (Fallback-Delegation)
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.addBtn');
+            if (!btn) return;
+            const id = btn.getAttribute('data-id');
+            const qtyInput = btn.closest('div').querySelector('input[type="number"]');
+            const qty = Math.max(1, parseInt(qtyInput?.value || '1', 10));
+            addToCart(id, qty);
+        });
+
+        // Toggle Mini Panel
+        (function () {
+            const btn = document.getElementById('miniCartToggle');
+            const panel = document.getElementById('miniCartPanel');
+            const root = document.getElementById('miniCartTopRight');
+            if (btn && panel && root && !btn.__bvBound) {
+                btn.__bvBound = true;
+                btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); panel.classList.toggle('hidden'); });
+                document.addEventListener('click', (e) => { if (!panel.classList.contains('hidden') && !root.contains(e.target)) panel.classList.add('hidden'); });
+            }
+        })();
+
+        // Live-Recalc for estimation inputs
+        ['fromDate', 'toDate', 'delivery', 'kmInput', 'returnTrip'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const evt = (el.type === 'checkbox' || el.tagName === 'SELECT') ? 'change' : 'input';
+                el.addEventListener(evt, () => { syncAll(); });
+            }
+        });
+
+        // Toggle delivery extras
+        document.getElementById('service')?.addEventListener('change', () => {
+            const sel = document.getElementById('service');
+            const v = sel.value.toLowerCase();
+
+            // Hidden spiegeln – WICHTIG für currentService()
+            const hidden = document.getElementById('serviceHidden');
+            if (hidden) hidden.value = v;
+
+            // Liefer-Extras ein-/ausblenden + Lieferkosten zurücksetzen bei Abholung
+            const extras = document.getElementById('deliveryExtras');
+            if (v === 'delivery' || v === 'all_inclusive') {
+                extras?.classList.remove('hidden');
+            } else {
+                extras?.classList.add('hidden');
+                const costEl = document.getElementById('deliveryCost');
+                const estEl = document.getElementById('deliveryEstimate');
+                if (costEl) costEl.value = '0';
+                if (estEl) estEl.textContent = EUR(0);
+            }
+
+            // Alles neu kalkulieren (damit die Kaution sofort sichtbar wird)
+            if (typeof syncAll === 'function') syncAll();
+            else { renderMainList?.(); renderMiniList?.(); updateEstimatesUI?.(); }
+           
+        });
+
+
+        // Init
+        syncAll();
+    </script>
+
+    <script src="bv-base.js"></script>
+</body>
+</html>

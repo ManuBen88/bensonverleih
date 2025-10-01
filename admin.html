@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BensonVerleih · Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica Neue,Arial,sans-serif}
+    .container-tight{max-width:1100px;margin:0 auto}
+    .hint{font-size:.8rem;color:#64748b}
+    .pill{font-size:.75rem;padding:.1rem .5rem;border-radius:999px;border:1px solid #cbd5e1}
+    input,select,textarea{outline:none}
+    .table th,.table td{border-bottom:1px solid #e2e8f0;padding:.65rem .5rem;vertical-align:top}
+    .table th{font-weight:600;color:#334155;white-space:nowrap}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-size:.8rem;border:1px solid #cbd5e1;border-bottom-width:2px;border-radius:.4rem;padding:.05rem .35rem;background:#f8fafc}
+  </style>
+</head>
+<body class="antialiased bg-white text-slate-800">
+  <header class="border-b">
+    <div class="container-tight px-4 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-extrabold">Admin · Produkte</h1>
+      <nav class="flex items-center gap-3 text-sm">
+        <a href="index.html" class="underline decoration-dotted">Frontend</a>
+        <a href="katalog.html" class="underline decoration-dotted">Katalog</a>
+        <a href="buchungen.html" class="underline decoration-dotted">Buchungen</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container-tight px-4 py-6 space-y-8">
+    <section class="p-5 rounded-xl border bg-white/70">
+      <h2 class="text-lg font-semibold">Neues Produkt anlegen</h2>
+      <form id="productForm" class="grid md:grid-cols-3 gap-4 mt-3">
+        <div>
+          <label class="block text-sm font-medium">Name</label>
+          <input id="name" required class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="z. B. Party-Zelt 4×12 m">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Kategorie</label>
+          <select id="category" class="mt-1 w-full rounded-lg border px-3 py-2">
+            <option value="zelt">zelt</option>
+            <option value="moebel">moebel</option>
+            <option value="technik">technik</option>
+            <option value="geschirr">geschirr</option>
+            <option value="katalog">katalog</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Preis pro Tag (€)</label>
+          <input id="pricePerDay" type="number" step="0.01" min="0" required class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="120">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Wochenende (€)</label>
+          <input id="weekend" type="number" step="0.01" min="0" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="optional">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Kaution (€)</label>
+          <input id="deposit" type="number" step="0.01" min="0" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="optional">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Bild-URL</label>
+          <input id="image" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="assets/zelt-4x12.jpg">
+        </div>
+        <div class="md:col-span-3">
+          <label class="block text-sm font-medium">Beschreibung</label>
+          <textarea id="description" rows="2" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Seitenwände inkl., robuste Plane."></textarea>
+        </div>
+        <div class="md:col-span-3 flex items-center justify-between">
+          <div class="hint">Tipp: <span class="kbd">Tab</span> bewegt zwischen Feldern, <span class="kbd">Enter</span> speichert.</div>
+          <div class="flex items-center gap-3">
+            <button id="resetBtn" type="button" class="px-3 py-2 rounded-lg border">Zurücksetzen</button>
+            <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Speichern</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="p-5 rounded-xl border bg-white/70">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Produkte</h2>
+        <div class="flex items-center gap-3">
+          <input id="search" class="rounded-lg border px-3 py-2" placeholder="Suche…">
+          <select id="filterCat" class="rounded-lg border px-3 py-2">
+            <option value="all">Alle Kategorien</option>
+            <option value="zelt">zelt</option>
+            <option value="moebel">moebel</option>
+            <option value="technik">technik</option>
+            <option value="geschirr">geschirr</option>
+            <option value="katalog">katalog</option>
+          </select>
+          <button id="syncBtn" class="px-3 py-2 rounded-lg border">↻ Neu laden</button>
+<button id="exportBVBase" class="px-3 py-2 rounded-lg border">Export → bv-base.js</button>
+        </div>
+      </div>
+      <div class="overflow-auto mt-4">
+        <table class="w-full table">
+          <thead>
+            <tr>
+              <th style="width:2rem">#</th>
+              <th>Name</th>
+              <th>Kat.</th>
+              <th>Tag</th>
+              <th>WE</th>
+              <th>Kaution</th>
+              <th>Bild</th>
+              <th>Beschreibung</th>
+              <th style="width:8rem">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="hint mt-3">Speicherziel: <span id="mode" class="pill">Auto (Backend → Fallback LocalStorage)</span></p>
+    </section>
+  </main>
+
+<script>
+// === Admin Data Layer: tries backend first, then falls back to localStorage ===
+const ENDPOINT = '/admin/products';
+const LS_KEY = 'bv_admin_products';
+function uid(){ return Math.random().toString(36).slice(2); }
+
+
+async function apiList(){
+  let backendItems = [];
+  let lsItems = [];
+  // Try backend first
+  try{
+    const r = await fetch(ENDPOINT, {credentials:'include', cache:'no-store'});
+    if(r.ok){
+      const j = await r.json();
+      backendItems = Array.isArray(j?.items) ? j.items : (Array.isArray(j) ? j : (Array.isArray(j?.data) ? j.data : []));
+    }
+  }catch(e){ /* ignore */ }
+  // Always read LocalStorage and MERGE (LS overrides backend for same id)
+  try{
+    lsItems = JSON.parse(localStorage.getItem(LS_KEY)||'[]');
+  }catch(e){ lsItems = []; }
+
+  const map = new Map();
+  (backendItems||[]).forEach(p=>{ if(p && p.id) map.set(p.id, p); });
+  (lsItems||[]).forEach(p=>{ if(p && p.id) map.set(p.id, p); }); // LS overrides
+  return Array.from(map.values());
+}
+}
+async function apiSave(product){
+  // product: {id?, name, category, pricePerDay, weekend?, deposit?, image?, description?}
+  try{
+    const r = await fetch(ENDPOINT, {
+      method: product.id ? 'PUT' : 'POST',
+      headers: {'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify(product)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return true;
+  }catch(e){
+    const arr = JSON.parse(localStorage.getItem(LS_KEY)||'[]');
+    if(!product.id) product.id = uid();
+    const i = arr.findIndex(p=>p.id===product.id);
+    if(i>=0) arr[i]=product; else arr.push(product);
+    localStorage.setItem(LS_KEY, JSON.stringify(arr));
+    return true;
+  }
+}
+async function apiDelete(id){
+  try{
+    const r = await fetch(ENDPOINT+'?id='+encodeURIComponent(id), {method:'DELETE', credentials:'include'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return true;
+  }catch(e){
+    const arr = JSON.parse(localStorage.getItem(LS_KEY)||'[]').filter(p=>p.id!==id);
+    localStorage.setItem(LS_KEY, JSON.stringify(arr));
+    return true;
+  }
+}
+
+// === Mirror to LocalStorage (so Katalog sieht Daten auch ohne Login) ===
+function mirrorToLocalStorage(items){
+  try{ localStorage.setItem('bv_admin_products', JSON.stringify(items||[])); }catch(e){}
+}
+
+// === Export to bv-base.js (window.ITEMS = [...]) ===
+function exportBVBase(items){
+  try{
+    const safe = (items||[]).map(p=>({ 
+      id: p.id, 
+      category: p.category, 
+      cat: p.category, 
+      name: p.name, 
+      pricePerDay: Number(p.pricePerDay||0), 
+      weekend: p.weekend!=null? Number(p.weekend): undefined, 
+      deposit: p.deposit!=null? Number(p.deposit): undefined, 
+      image: p.image||'', 
+      description: p.description||''
+    }));
+    const content = `// Auto-exported from Admin on ${new Date().toISOString()}
+window.ITEMS = ${JSON.stringify(safe, null, 2)};`;
+
+    const blob = new Blob([content], {type:'application/javascript'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bv-base.js';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }catch(e){
+    alert('Export fehlgeschlagen: '+e.message);
+  }
+}
+
+// === UI Logic ===
+const rows = document.getElementById('rows');
+const search = document.getElementById('search');
+const filterCat = document.getElementById('filterCat');
+const form = document.getElementById('productForm');
+const mode = document.getElementById('mode');
+
+let state = { items: [], editing: null };
+
+async function refresh(){
+  state.items = await apiList();
+  mirrorToLocalStorage(state.items);
+  renderRows();
+}
+
+function filtered(){
+  const q = (search.value||'').toLowerCase();
+  const catSel = (filterCat.value||'all').toLowerCase();
+  return state.items.filter(p=>{
+    const t = (p.name+' '+(p.description||'')).toLowerCase();
+    const inTxt = !q || t.includes(q);
+    const itemCat = (p.category||'').toLowerCase();
+    const inCat = catSel==='all' || itemCat===catSel;
+    return inTxt && inCat;
+  });
+}
+function renderRows(){
+  const data = filtered();
+  rows.innerHTML = data.map((p, idx)=>`
+    <tr>
+      <td>${idx+1}</td>
+      <td class="font-medium">${p.name||''}<div class="text-xs text-slate-500">${p.id||''}</div></td>
+      <td>${p.category||''}</td>
+      <td>€${Number(p.pricePerDay||0).toFixed(2)}</td>
+      <td>${p.weekend?('€'+Number(p.weekend).toFixed(2)):'—'}</td>
+      <td>${p.deposit?('€'+Number(p.deposit).toFixed(2)):'—'}</td>
+      <td>${p.image?(`<img src="${p.image}" alt="" class="h-10 w-10 object-cover rounded" onerror="this.style.display='none'">`):'—'}</td>
+      <td class="text-sm">${p.description||''}</td>
+      <td class="space-x-2">
+        <button class="px-2 py-1 rounded border" data-edit="${p.id}">Bearb.</button>
+        <button class="px-2 py-1 rounded border text-red-600" data-del="${p.id}">Löschen</button>
+      </td>
+    </tr>
+  `).join('');
+
+  rows.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>startEdit(b.dataset.edit));
+  rows.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>onDelete(b.dataset.del));
+}
+function fillForm(p){
+  form.name.value = p?.name||'';
+  form.category.value = p?.category||'katalog';
+  form.pricePerDay.value = p?.pricePerDay||'';
+  form.weekend.value = p?.weekend||'';
+  form.deposit.value = p?.deposit||'';
+  form.image.value = p?.image||'';
+  form.description.value = p?.description||'';
+}
+function startEdit(id){
+  const p = state.items.find(x=>x.id===id);
+  if(!p) return;
+  state.editing = id;
+  fillForm(p);
+  form.querySelector('button[type="submit"]').textContent = 'Änderungen speichern';
+}
+function clearForm(){
+  state.editing = null;
+  fillForm(null);
+  form.querySelector('button[type="submit"]').textContent = 'Speichern';
+}
+async function onDelete(id){
+  if(!confirm('Dieses Produkt wirklich löschen?')) return;
+  await apiDelete(id);
+  await refresh();
+}
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const payload = {
+    id: state.editing || undefined,
+    name: form.name.value.trim(),
+    category: form.category.value,
+    pricePerDay: Number(form.pricePerDay.value||0),
+    weekend: form.weekend.value ? Number(form.weekend.value) : undefined,
+    deposit: form.deposit.value ? Number(form.deposit.value) : undefined,
+    image: form.image.value.trim() || undefined,
+    description: form.description.value.trim() || undefined
+  };
+  await apiSave(payload);
+  clearForm();
+  await refresh();
+});
+document.getElementById('resetBtn').addEventListener('click', clearForm);
+document.getElementById('syncBtn').addEventListener('click', refresh);
+search.addEventListener('input', renderRows);
+filterCat.addEventListener('change', renderRows);
+
+// On load: detect storage mode
+(async function init(){
+  try{
+    const r = await fetch(ENDPOINT, {credentials:'include'});
+    mode.textContent = r.ok ? 'Backend' : 'LocalStorage';
+  }catch(e){ mode.textContent = 'LocalStorage'; }
+  await refresh();
+  document.getElementById('exportBVBase')?.addEventListener('click', ()=> exportBVBase(state.items||[]));
+})();
+
+</script>
+</body>
+</html>
