@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BensonVerleih – Event-Equipment mieten</title>
+  <title>BensonVerleihe – Event-Equipment mieten</title>
   <meta name="description" content="Zelte, Garnituren, Stehtische, Heizstrahler, Lichterketten & mehr mieten in Lüneburg/Uelzen. Direkte Buchung über Kalender." />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -65,7 +65,7 @@
                     <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Event‑Equipment mieten <span class="text-brand-600">für dein Fest</span></h1>
                     <p class="mt-4 text-lg text-slate-600 dark:text-slate-300">Zelte, Bierzeltgarnituren, Stehtische, Heizstrahler, Lichterketten u.v.m. – fair, flexibel, zuverlässig.</p>
                     <div class="mt-6 flex flex-wrap items-center gap-3">
-                        <a href="#booking" class="px-5 py-3 rounded-2xl bg-brand-600 text-white hover:bg-brand-700 shadow-sm font-semibold">Jetzt anfragen</a>
+                        <a href="#contact" class="px-5 py-3 rounded-2xl bg-brand-600 text-white hover:bg-brand-700 shadow-sm font-semibold">Jetzt anfragen</a>
                         <a href="#features" class="px-5 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900 font-semibold">Katalog ansehen</a>
                     </div>
                 </div>
@@ -246,7 +246,7 @@
     </footer>
 
     <!-- Google Maps JS (Distance Matrix) -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA763C3sIBm1eR-CZAk-Z3JQ4SaP3VQfQ8&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKd4jZJC45ylDaxympTWnftc35ypUdzeo&libraries=places"></script>
 
     <script>
         /* ===== Globale Helfer (nur setzen, wenn noch nicht vorhanden) ===== */
@@ -917,14 +917,15 @@
         // === Produktdaten + schneller Index ===
         window.ITEMS = [
             { id: 'zelt_4x6', cat: 'zelt', name: 'Party-Zelt 4×6 m', price3: 30, day: 30, weekend: 35, deposit: 100, img: 'assets/zelt-klein.jpg', desc: 'Seitenwände inkl.' },
-            { id: 'zelt_4x12', cat: 'zelt', name: 'Party-Zelt 4×12 m', price3: 85, day: 85, weekend: 100, deposit: 150, img: 'assets/hero.jpg', desc: 'Großes Zelt, Seitenwände inkl.' },
+            { id: 'zelt_4x12', cat: 'zelt', name: 'Party-Zelt 4×12 m', price3: 85, day: 85, weekend: 100, deposit: 150, img: 'assets/zelt-rampen.jpg', desc: 'Großes Zelt, Seitenwände inkl.' },
             { id: 'set_biergarnitur', cat: 'moebel', name: 'Bierzeltgarnitur (Tisch 220×70 + 2 Bänke)', price3: 10, day: 10, weekend: 12, deposit: 30, img: 'assets/biergarnitur.jpg', desc: 'Für 6–8 Personen.' },
             { id: 'stehtisch', cat: 'moebel', name: 'Stehtisch Ø70 cm', price3: 5, day: 5, weekend: 7, deposit: 50, img: 'assets/stehtisch.jpg', desc: 'Klapptisch, Husse optional.' },
             { id: 'lichterkette', cat: 'technik', name: 'Lichterkette 10 m (LED)', price3: 8, day: 8, weekend: 18, deposit: 20, img: 'assets/lichtkette.jpg', desc: 'Warmweiß, erweiterbar.' },
             { id: 'teller_set', cat: 'geschirr', name: 'Teller-Set (10 Stk.)', price3: 5, day: 5, weekend: 10, deposit: 15, img: 'assets/teller.jpg', desc: 'Porzellan.' },
             { id: 'glaeser_set', cat: 'geschirr', name: 'Gläser-Set (12 Stk.)', price3: 5, day: 5, weekend: 10, deposit: 15, img: 'assets/glaeser.jpg', desc: 'Universal.' },
             { id: 'husseBier', cat: 'Deko', name: 'Bierbank-Husse inklusive Reinigung', price3: 5, day: 5, weekend: 10, deposit: 5, img: 'assets/bhusse.jpg', desc: 'Universal.' },
-            { id: 'husseSteh', cat: 'Deko', name: 'Stehtisch-Husse inklusive Reinigung', price3: 5, day: 5, weekend: 10, deposit: 5, img: 'assets/shusse.jpg', desc: 'Universal.' }
+            { id: 'husseSteh', cat: 'Deko', name: 'Stehtisch-Husse inklusive Reinigung', price3: 5, day: 5, weekend: 10, deposit: 5, img: 'assets/shusse.jpg', desc: 'Universal.' },
+            { id: 'husseSteh', cat: 'zelt', name: 'Zeltboden 10m²', price3: 100, day: 5, weekend: 150, deposit: 0, img: 'assets/boden.jpg', desc: 'rechtzeitig anfragen.' }
         ];
 
 
