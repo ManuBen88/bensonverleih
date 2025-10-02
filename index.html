@@ -236,14 +236,41 @@
 
 
     <footer class="py-10">
-        <div class="mx-auto container-tight px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p class="text-sm text-slate-500 dark:text-slate-400">© <span id="year"></span> BensonVerleihe. Alle Rechte vorbehalten.</p>
-            <nav class="flex items-center gap-4 text-sm">
-                <a href="#" id="openImpressum" class="underline decoration-dotted">Impressum</a>
-                <a href="#" id="openPrivacy" class="underline decoration-dotted">Datenschutz</a>
+    <div class="mx-auto container-tight px-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <p class="text-sm text-slate-500 dark:text-slate-400">
+            © <span id="year"></span> BensonVerleih. Alle Rechte vorbehalten.
+        </p>
+
+        <div class="text-sm text-slate-700 dark:text-slate-300">
+            <nav class="flex items-center gap-4 mb-2">
+                <a href="#impressum" class="underline decoration-dotted">Impressum</a>
+                <a href="#privacy" class="underline decoration-dotted">Datenschutz</a>
             </nav>
+
+            <!-- Impressum im Footer -->
+            <section id="impressum" class="leading-relaxed">
+                <strong>BensonVerleih</strong><br>
+                Manuel Benson<br>
+                <address class="not-italic">
+                    Neue Str. 2<br>
+                    29553 Bienenbüttel
+                </address>
+                <div class="mt-1">
+                    <strong>Umsatzsteuer-ID:</strong> DE340376350
+                </div>
+                <div class="mt-1">
+                    <strong>Kontakt:</strong>
+                    <a href="#contact" class="underline">Kontaktformular</a>
+                    <!-- Alternativ: Telefonnummer hier angeben -->
+                </div>
+                <div class="mt-1 text-slate-500 dark:text-slate-400">
+                    Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren
+                    vor einer Verbraucherschlichtungsstelle teilzunehmen (VSBG).
+                </div>
+            </section>
         </div>
-    </footer>
+    </div>
+</footer>
 
     <!-- Google Maps JS (Distance Matrix) -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKd4jZJC45ylDaxympTWnftc35ypUdzeo&libraries=places"></script>
