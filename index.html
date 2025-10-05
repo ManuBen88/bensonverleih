@@ -23,6 +23,7 @@
   </style>
 </head>
 
+
 <body class="antialiased text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-950">
     <header class="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60 border-b border-slate-200/60 dark:border-slate-800">
         <div class="mx-auto container-tight px-4 py-3 flex items-center justify-between">
@@ -33,7 +34,7 @@
             <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
                 <a href="#features" class="hover:text-brand-600">Katalog</a>
                 <a href="#contact" class="hover:text-brand-600">Buchung</a>
-              
+
 
             </nav>
         </div>
@@ -166,7 +167,7 @@
                             <p class="mt-1 text-xs text-slate-500">Lieferung & Aufbau berechnen die Entfernung mit Google Maps.</p>
                         </div>
 
-   
+
 
                         <!-- NEU: Wunschzeiten -->
                         <div class="grid grid-cols-2 gap-4">
@@ -236,41 +237,43 @@
 
 
     <footer class="py-10">
-    <div class="mx-auto container-tight px-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <p class="text-sm text-slate-500 dark:text-slate-400">
-            © <span id="year"></span> BensonVerleih. Alle Rechte vorbehalten.
-        </p>
+        <div class="mx-auto container-tight px-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+                © <span id="year"></span> BensonVerleih. Alle Rechte vorbehalten.
+            </p>
 
-        <div class="text-sm text-slate-700 dark:text-slate-300">
-            <nav class="flex items-center gap-4 mb-2">
-                <a href="#impressum" class="underline decoration-dotted">Impressum</a>
-                <a href="#privacy" class="underline decoration-dotted">Datenschutz</a>
-            </nav>
+            <div class="text-sm text-slate-700 dark:text-slate-300">
+                <nav class="flex items-center gap-4 mb-2">
+                    <a href="#impressum" class="underline decoration-dotted">Impressum</a>
+                    <a href="#privacy" class="underline decoration-dotted">Datenschutz</a>
+                </nav>
 
-            <!-- Impressum im Footer -->
-            <section id="impressum" class="leading-relaxed">
-                <strong>BensonVerleih</strong><br>
-                Manuel Benson<br>
-                <address class="not-italic">
-                    Neue Str. 2<br>
-                    29553 Bienenbüttel
-                </address>
-                <div class="mt-1">
-                    <strong>Umsatzsteuer-ID:</strong> DE340376350
-                </div>
-                <div class="mt-1">
-                    <strong>Kontakt:</strong>
-                    <a href="#contact" class="underline">Kontaktformular</a>
-                    <!-- Alternativ: Telefonnummer hier angeben -->
-                </div>
-                <div class="mt-1 text-slate-500 dark:text-slate-400">
-                    Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren
-                    vor einer Verbraucherschlichtungsstelle teilzunehmen (VSBG).
-                </div>
-            </section>
+                <!-- Impressum im Footer -->
+                <section id="impressum" class="leading-relaxed">
+                    <strong>BensonVerleih</strong><br>
+                    Manuel Benson<br>
+                    <address class="not-italic">
+                        Neue Str. 2<br>
+                        29553 Bienenbüttel
+                    </address>
+                    <div class="mt-1">
+                        <strong>Umsatzsteuer-ID:</strong> DE340376350
+                    </div>
+                    <div class="mt-1">
+                        <strong>Kontakt:</strong>
+                        <a href="#contact" class="underline">Kontaktformular</a>
+                        <!-- Alternativ: Telefonnummer hier angeben -->
+                    </div>
+                    <div class="mt-1 text-slate-500 dark:text-slate-400">
+                        Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren
+                        vor einer Verbraucherschlichtungsstelle teilzunehmen (VSBG).
+                    </div>
+                </section>
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
+
+
 
     <!-- Google Maps JS (Distance Matrix) -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKd4jZJC45ylDaxympTWnftc35ypUdzeo&libraries=places"></script>
@@ -289,7 +292,7 @@
         window.RATE_PER_KM ??= 0.45;
         window.TRIPS_FACTOR ??= 4; // 4 Fahrten
 
-   
+
 
         /* ===== Anfrage-Übersicht (Sidebar) inkl. Liefer- & Lohnkosten ===== */
         function renderSideCartExtra() {
@@ -314,40 +317,40 @@
                 const line = linePriceFor(id, qty, (typeof rentalDays === 'function') ? rentalDays() : 1);
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-        <span>${qty}× ${it.name}</span>
-        <span>${EUR(line)}</span>
-      </li>`
+                    <span>${qty}× ${it.name}</span>
+                    <span>${EUR(line)}</span>
+                  </li>`
                 );
             });
 
             // Summen
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
-      <span class="font-medium">Zwischensumme</span>
-      <span class="font-medium">${EUR(items)}</span>
-    </li>`
+                  <span class="font-medium">Zwischensumme</span>
+                  <span class="font-medium">${EUR(items)}</span>
+                </li>`
             );
             if (delivery > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-        <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
-        <span>${EUR(delivery)}</span>
-      </li>`
+                    <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+                    <span>${EUR(delivery)}</span>
+                  </li>`
                 );
             }
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-        <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
-        <span>${EUR(labor)}</span>
-      </li>`
+                    <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                    <span>${EUR(labor)}</span>
+                  </li>`
                 );
             }
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
-      <span>Gesamt</span>
-      <span>${EUR(total)}</span>
-    </li>`
+                  <span>Gesamt</span>
+                  <span>${EUR(total)}</span>
+                </li>`
             );
 
             ul.innerHTML = rows.join('');
@@ -500,6 +503,28 @@
 
             form.addEventListener('submit', async (ev) => {
                 ev.preventDefault();
+                // === Guard: alle Pflichtfelder + mind. 1 Artikel im Warenkorb ===
+                const hasCartItems = !!(window.cart && Array.from(window.cart.values()).some(q => (q | 0) > 0));
+
+                // HTML5-Checks (required, type="email", etc.)
+                const formValid = form.reportValidity();
+
+                if (!formValid || !hasCartItems) {
+                    // Nutzerhinweis
+                    show(false, !hasCartItems
+                        ? 'Bitte füge mindestens einen Artikel dem Warenkorb hinzu.'
+                        : 'Bitte fülle alle Pflichtfelder aus.');
+
+                    // Scroll zum relevanten Bereich
+                    (!hasCartItems ? document.getElementById('features') : document.getElementById('contact'))
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    // Button zurücksetzen (falls du ihn oben schon gesperrt hast)
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn) { btn.disabled = false; btn.textContent = 'Anfrage senden'; }
+                    return; // Abbrechen, NICHT senden
+                }
+
 
                 const statusEl = getStatusBox();
                 const show = (ok, msg) => {
@@ -537,7 +562,7 @@
                 try {
                     // Wichtig: mode:'no-cors' vermeidet CORS-Ärger; Antwort kann nicht gelesen werden,
                     // aber das Script bekommt die Daten und sendet dir die E-Mail.
-                    fetch('https://script.google.com/macros/s/AKfycbyuhKF2JpLYQSScSlB1DrlXL5WfEZnohxUTsNPKwoth0NbsFdnQqlmXGMlGKy0lw18UtQ/exec', { method: 'POST', body: fd, mode: 'no-cors' });
+                    fetch('https://script.google.com/macros/s/AKfycbz2LYbnqZr28SKi1YKIpKOBbvjzBeXuDBT8CDkWDr0fn0W0D1a0WsS1Yeb75go3Zf9w4A/exec', { method: 'POST', body: fd, mode: 'no-cors' });
 
                     // Optional: Du KANNST zusätzlich Netlify Forms posten, wenn du später umstellst:
                     // await fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
@@ -649,9 +674,9 @@
 
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-        <span>${qty}× ${it.name}</span>
-        <span>${EUR(line)}</span>
-      </li>`
+                    <span>${qty}× ${it.name}</span>
+                    <span>${EUR(line)}</span>
+                  </li>`
                 );
             });
 
@@ -662,26 +687,26 @@
             // --- Zwischensumme + Zuschläge + Gesamt ---
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
-      <span class="font-medium">Zwischensumme</span>
-      <span class="font-medium">${EUR(sumItems)}</span>
-    </li>`
+                  <span class="font-medium">Zwischensumme</span>
+                  <span class="font-medium">${EUR(sumItems)}</span>
+                </li>`
             );
 
             if (delivery > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-        <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
-        <span>${EUR(delivery)}</span>
-      </li>`
+                    <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+                    <span>${EUR(delivery)}</span>
+                  </li>`
                 );
             }
 
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-        <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
-        <span>${EUR(labor)}</span>
-      </li>`
+                    <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                    <span>${EUR(labor)}</span>
+                  </li>`
                 );
             }
 
@@ -689,9 +714,9 @@
 
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
-      <span>Gesamt</span>
-      <span>${EUR(total)}</span>
-    </li>`
+                  <span>Gesamt</span>
+                  <span>${EUR(total)}</span>
+                </li>`
             );
 
             ul.innerHTML = rows.join('');
@@ -842,8 +867,8 @@
             const form = document.getElementById('contactForm');
             const statusEl = document.getElementById('formStatus');
 
-        
- 
+
+
 
         })();
     </script>
@@ -982,20 +1007,20 @@
                 return inCat && inTxt;
             });
             catalogGrid.innerHTML = filtered.map(item => `
-          <div class="p-0 rounded-2xl border bg-white/60 dark:bg-slate-900/60 flex flex-col overflow-hidden">
-            ${cardImageHTML(item)}
-            <div class="p-6 flex-1">
-              <div class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">${item.cat}</div>
-              <h3 class="font-semibold text-lg mt-1">${item.name}</h3>
-              <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">${item.desc || ''}</p>
-              <div class="mt-2 text-sm text-slate-600 dark:text-slate-300"><span class="font-semibold">${money(item.price3 ?? item.day)}</span>/3 Tage · Kaution ca. ${money(item.deposit)}</div>
-              <div class="mt-4 flex items-center gap-3">
-                <input type="number" min="1" value="1" class="w-20 rounded-xl border px-3 py-2" aria-label="Menge" />
-                <button type="button" class="px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 font-semibold addBtn" data-id="${item.id}">Hinzufügen</button>
-              </div>
-            </div>
-          </div>
-        `).join('');
+                      <div class="p-0 rounded-2xl border bg-white/60 dark:bg-slate-900/60 flex flex-col overflow-hidden">
+                        ${cardImageHTML(item)}
+                        <div class="p-6 flex-1">
+                          <div class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">${item.cat}</div>
+                          <h3 class="font-semibold text-lg mt-1">${item.name}</h3>
+                          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">${item.desc || ''}</p>
+                          <div class="mt-2 text-sm text-slate-600 dark:text-slate-300"><span class="font-semibold">${money(item.price3 ?? item.day)}</span>/3 Tage · Kaution ca. ${money(item.deposit)}</div>
+                          <div class="mt-4 flex items-center gap-3">
+                            <input type="number" min="1" value="1" class="w-20 rounded-xl border px-3 py-2" aria-label="Menge" />
+                            <button type="button" class="px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 font-semibold addBtn" data-id="${item.id}">Hinzufügen</button>
+                          </div>
+                        </div>
+                      </div>
+                    `).join('');
         }
         renderCatalog();
         document.getElementById('catalogSearch')?.addEventListener('input', renderCatalog);
@@ -1007,7 +1032,7 @@
         function parseDate(id) { const el = document.getElementById(id); if (!el || !el.value) return null; const d = new Date(el.value + 'T00:00:00'); return isNaN(d) ? null : d; }
         function rentalDays() { const a = parseDate('fromDate'), b = parseDate('toDate'); if (!a || !b) return 1; const ms = b - a; if (ms < 0) return 1; return Math.max(1, Math.floor(ms / 86400000) + 1); }
         // ---------------------------------------------------------- Einstellen ----------------------------------------------------------
-        const FLAT3_IDS = new Set(['zelt_4x6', 'zelt_4x12', 'set_biergarnitur', 'stehtisch','lichterkette']);
+        const FLAT3_IDS = new Set(['zelt_4x6', 'zelt_4x12', 'set_biergarnitur', 'stehtisch', 'lichterkette']);
         // ---------------------------------------------------------- Einstellen ----------------------------------------------------------
 
 
@@ -1075,48 +1100,48 @@
                 const line = linePriceFor(id, qty, days);
                 rows.push(
                     `<li class="py-2 flex items-center gap-3" data-id="${id}" data-qty="${qty}">
-        <div class="flex-1">
-          <div class="font-medium leading-tight">${it.name}</div>
-          <div class="text-xs text-slate-500">${qty}× ${EUR(pricePerBundle(it))} /3 Tage × ${Math.ceil(Math.max(1, days) / 3)} Pakete = <strong>${EUR(line)}</strong></div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button class="px-2 py-1 rounded border" data-dec="${id}">−</button>
-          <input type="number" min="0" class="w-16 rounded border px-2 py-1 qty" value="${qty}" data-q="${id}">
-          <button class="px-2 py-1 rounded border" data-inc="${id}">+</button>
-          <button class="px-2 py-1 rounded border text-red-600" data-del="${id}">×</button>
-        </div>
-      </li>`
+                    <div class="flex-1">
+                      <div class="font-medium leading-tight">${it.name}</div>
+                      <div class="text-xs text-slate-500">${qty}× ${EUR(pricePerBundle(it))} /3 Tage × ${Math.ceil(Math.max(1, days) / 3)} Pakete = <strong>${EUR(line)}</strong></div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button class="px-2 py-1 rounded border" data-dec="${id}">−</button>
+                      <input type="number" min="0" class="w-16 rounded border px-2 py-1 qty" value="${qty}" data-q="${id}">
+                      <button class="px-2 py-1 rounded border" data-inc="${id}">+</button>
+                      <button class="px-2 py-1 rounded border text-red-600" data-del="${id}">×</button>
+                    </div>
+                  </li>`
                 );
             });
 
             // Summen
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
-      <span class="font-medium">Zwischensumme</span>
-      <span class="font-medium">${EUR(items)}</span>
-    </li>`
+                  <span class="font-medium">Zwischensumme</span>
+                  <span class="font-medium">${EUR(items)}</span>
+                </li>`
             );
             if (delivery > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-        <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
-        <span>${EUR(delivery)}</span>
-      </li>`
+                    <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+                    <span>${EUR(delivery)}</span>
+                  </li>`
                 );
             }
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-        <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
-        <span>${EUR(labor)}</span>
-      </li>`
+                    <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                    <span>${EUR(labor)}</span>
+                  </li>`
                 );
             }
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
-      <span>Gesamt</span>
-      <span>${EUR(total)}</span>
-    </li>`
+                  <span>Gesamt</span>
+                  <span>${EUR(total)}</span>
+                </li>`
             );
 
             ul.innerHTML = rows.join('');
@@ -1163,9 +1188,9 @@
                         : (FLAT3_IDS.has(id) && days > 3 ? ' <span class="text-xs text-slate-500">(30 €/3T + Rest normal)</span>' : '');
                     rows.push(
                         `<li class="flex items-center justify-between gap-2">
-         <span>${qty}× ${p.name}${note}</span>
-         <span>${EUR(line)}</span>
-       </li>`
+                     <span>${qty}× ${p.name}${note}</span>
+                     <span>${EUR(line)}</span>
+                   </li>`
                     );
                 }
             });
@@ -1175,9 +1200,9 @@
             // Zwischensumme (Artikel)
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
-       <span class="font-medium">Zwischensumme</span>
-       <span class="font-medium">${EUR(sumItems)}</span>
-     </li>`
+                   <span class="font-medium">Zwischensumme</span>
+                   <span class="font-medium">${EUR(sumItems)}</span>
+                 </li>`
             );
 
             // Liefer- & Lohnkosten
@@ -1185,18 +1210,18 @@
             if (delivery > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-         <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
-         <span>${EUR(delivery)}</span>
-       </li>`
+                     <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+                     <span>${EUR(delivery)}</span>
+                   </li>`
                 );
             }
             const labor = computeLaborCost();
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-         <span>Lohnkosten <span class="text-xs text-slate-500">(Lieferung und Auf-/Abbau)</span></span>
-         <span>${EUR(labor)}</span>
-       </li>`
+                     <span>Lohnkosten <span class="text-xs text-slate-500">(Lieferung und Auf-/Abbau)</span></span>
+                     <span>${EUR(labor)}</span>
+                   </li>`
                 );
             }
 
@@ -1204,9 +1229,9 @@
             const total = sumItems + delivery + labor;
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
-       <span>Gesamt</span>
-       <span>${EUR(total)}</span>
-     </li>`
+                   <span>Gesamt</span>
+                   <span>${EUR(total)}</span>
+                 </li>`
             );
 
             list.innerHTML = rows.join('');
@@ -1359,13 +1384,68 @@
             // Alles neu kalkulieren (damit die Kaution sofort sichtbar wird)
             if (typeof syncAll === 'function') syncAll();
             else { renderMainList?.(); renderMiniList?.(); updateEstimatesUI?.(); }
-           
+
         });
 
 
         // Init
         syncAll();
     </script>
+    <script>
+        (function enableLiveSubmitGuard() {
+            const form = document.getElementById('contactForm');
+            if (!form) return;
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            // Kleiner Hinweistext unter dem Button
+            let hint = document.getElementById('submitGuardHint');
+            if (!hint) {
+                hint = document.createElement('p');
+                hint.id = 'submitGuardHint';
+                hint.className = 'mt-2 text-xs';
+                submitBtn.insertAdjacentElement('afterend', hint);
+            }
+
+            function cartHasItems() {
+                return !!(window.cart && Array.from(window.cart.values()).some(q => (q | 0) > 0));
+            }
+
+            function updateSubmitState() {
+                const okForm = form.checkValidity();
+                const okCart = cartHasItems();
+                const ok = okForm && okCart;
+
+                submitBtn.disabled = !ok;
+                submitBtn.classList.toggle('opacity-50', !ok);
+                submitBtn.classList.toggle('cursor-not-allowed', !ok);
+
+                if (!ok) {
+                    hint.textContent = okCart
+                        ? 'Bitte fülle alle Pflichtfelder aus.'
+                        : 'Bitte füge mindestens einen Artikel dem Warenkorb hinzu.';
+                    hint.classList.remove('text-slate-500'); // falls mal geändert
+                    hint.classList.add('text-red-600');
+                } else {
+                    hint.textContent = '';
+                }
+            }
+
+            // Bei Formular-Änderungen prüfen
+            form.addEventListener('input', updateSubmitState, true);
+            form.addEventListener('change', updateSubmitState, true);
+
+            // Auch prüfen, wenn sich der Warenkorb ändert
+            const prevSyncAll = window.syncAll;
+            window.syncAll = function (...args) {
+                prevSyncAll && prevSyncAll.apply(this, args);
+                updateSubmitState();
+            };
+
+            // Initial
+            updateSubmitState();
+        })();
+    </script>
+
 
     <script src="bv-base.js"></script>
 </body>
