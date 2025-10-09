@@ -562,7 +562,7 @@
                 try {
                     // Wichtig: mode:'no-cors' vermeidet CORS-Ärger; Antwort kann nicht gelesen werden,
                     // aber das Script bekommt die Daten und sendet dir die E-Mail.
-                    fetch('https://script.google.com/macros/s/AKfycbzusItEXsNAcFqF617Y5QrdJfi0ob91oiJr3SPtBx9waTl-aW68VDL2PCQeAB0FBaFv5g/exec', { method: 'POST', body: fd, mode: 'no-cors' });
+                    fetch('https://script.google.com/macros/s/AKfycbz8sVTjTnBrr0RQ3Ghbx77xT4IT6CjqfYRUJ6P747h7F4i2pHhYgDDJXCWFZ8iOJlJElw/exec', { method: 'POST', body: fd, mode: 'no-cors' });
 
                     // Optional: Du KANNST zusätzlich Netlify Forms posten, wenn du später umstellst:
                     // await fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
@@ -1445,6 +1445,55 @@
             updateSubmitState();
         })();
     </script>
+    <script>
+  // Toggle: same-day erlauben (true) oder verbieten (false)
+  const ALLOW_SAME_DAY = false;
+
+  const fromEl = document.getElementById('from');
+  const toEl   = document.getElementById('to');
+
+  // Hilfsfunktionen für lokales YYYY-MM-DD (ohne Zeitzonen-Überraschungen)
+  const toYMD = d => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+  const addDays = (ymd, n) => {
+    const [y,m,d] = ymd.split('-').map(Number);
+    const dt = new Date(y, m-1, d);
+    dt.setDate(dt.getDate()+n);
+    return toYMD(dt);
+  };
+
+  // min = heute für "from"
+  const today = toYMD(new Date());
+  fromEl.min = today;
+
+  // Initial setzen: to = from + (ALLOW_SAME_DAY ? 0 : 1)
+  function enforceBounds() {
+    const fromVal = fromEl.value || today;
+    const minTo = addDays(fromVal, ALLOW_SAME_DAY ? 0 : 1);
+    toEl.min = minTo;
+
+    // if to < minTo → hochziehen
+    if (!toEl.value || toEl.value < minTo) {
+      toEl.value = minTo;
+    }
+  }
+
+  // Defaults beim ersten Laden
+  fromEl.value ||= today;
+  enforceBounds();
+
+  // Reagieren auf Änderungen
+  fromEl.addEventListener('change', enforceBounds);
+
+  // Optional: falls jemand versucht "to" manuell früher zu setzen
+  toEl.addEventListener('change', () => {
+    if (toEl.value < toEl.min) toEl.value = toEl.min;
+  });
+</script>
 
 
     <script src="bv-base.js"></script>
