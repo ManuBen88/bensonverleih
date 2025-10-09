@@ -155,6 +155,49 @@
                                 <input id="toDate" name="to" type="date" required class="mt-1 w-full rounded-xl border px-3 py-2" />
                             </div>
                         </div>
+                        <script>
+                            // same-day verbieten (to = from + 1)
+                            (function enforceNextDayOnly() {
+                                const fromEl = document.getElementById('fromDate');
+                                const toEl = document.getElementById('toDate');
+                                if (!fromEl || !toEl) return;
+
+                                const toYMD = d => {
+                                    const y = d.getFullYear();
+                                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                                    const day = String(d.getDate()).padStart(2, '0');
+                                    return `${y}-${m}-${day}`;
+                                };
+                                const addDays = (ymd, n) => {
+                                    const [y, m, d] = (ymd || '').split('-').map(Number);
+                                    const dt = new Date(y, (m || 1) - 1, d || 1);
+                                    dt.setDate(dt.getDate() + n);
+                                    return toYMD(dt);
+                                };
+
+                                const today = toYMD(new Date());
+                                fromEl.min = today;                  // ab heute buchbar
+                                fromEl.value ||= today;              // default heute
+                                function applyBounds() {
+                                    const from = fromEl.value || today;
+                                    const minTo = addDays(from, 1);    // immer mindestens nächster Tag
+                                    toEl.min = minTo;
+                                    if (!toEl.value || toEl.value < minTo) {
+                                        toEl.value = minTo;              // hochziehen, falls zu früh
+                                    }
+                                    // Totals neu berechnen, falls deine Logik vorhanden ist
+                                    if (typeof window.syncAll === 'function') window.syncAll();
+                                    else if (typeof window.updateEstimatesUI === 'function') window.updateEstimatesUI();
+                                }
+                                applyBounds();
+
+                                fromEl.addEventListener('change', applyBounds);
+                                toEl.addEventListener('change', () => {
+                                    if (toEl.value < toEl.min) { toEl.value = toEl.min; applyBounds(); }
+                                });
+                            })();
+                        </script>
+
 
                         <!-- Service-Optionen -->
                         <div>
@@ -172,12 +215,12 @@
                         <!-- NEU: Wunschzeiten -->
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium" for="fromTime">Uhrzeit (Start)</label>
-                                <input id="fromTime" name="from_time" type="time" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="z. B. 09:00" />
+                                <label class="block text-sm font-medium" for="fromTime">Uhrzeit (Aufbau)</label>
+                                <input id="fromTime" name="from_time" type="time" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="z. B. 09:00" required />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium" for="toTime">Uhrzeit (Ende)</label>
-                                <input id="toTime" name="to_time" type="time" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="z. B. 18:00" />
+                                <label class="block text-sm font-medium" for="toTime">Uhrzeit (Abbau)</label>
+                                <input id="toTime" name="to_time" type="time" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="z. B. 18:00" required />
                             </div>
                         </div>
 
@@ -317,40 +360,40 @@
                 const line = linePriceFor(id, qty, (typeof rentalDays === 'function') ? rentalDays() : 1);
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                    <span>${qty}× ${it.name}</span>
-                    <span>${EUR(line)}</span>
-                  </li>`
+                                <span>${qty}× ${it.name}</span>
+                                <span>${EUR(line)}</span>
+                              </li>`
                 );
             });
 
             // Summen
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
-                  <span class="font-medium">Zwischensumme</span>
-                  <span class="font-medium">${EUR(items)}</span>
-                </li>`
+                              <span class="font-medium">Zwischensumme</span>
+                              <span class="font-medium">${EUR(items)}</span>
+                            </li>`
             );
             if (delivery > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                    <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
-                    <span>${EUR(delivery)}</span>
-                  </li>`
+                                <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+                                <span>${EUR(delivery)}</span>
+                              </li>`
                 );
             }
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                    <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
-                    <span>${EUR(labor)}</span>
-                  </li>`
+                                <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                                <span>${EUR(labor)}</span>
+                              </li>`
                 );
             }
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
-                  <span>Gesamt</span>
-                  <span>${EUR(total)}</span>
-                </li>`
+                              <span>Gesamt</span>
+                              <span>${EUR(total)}</span>
+                            </li>`
             );
 
             ul.innerHTML = rows.join('');
@@ -360,6 +403,11 @@
 
 
         /* ===== Lieferung & Entfernung (Google) – sicher initialisieren ===== */
+
+
+
+
+
         document.addEventListener('DOMContentLoaded', () => {
             const ORIGIN = "Neue Str. 2, 29553 Bienenbüttel";
 
@@ -562,7 +610,7 @@
                 try {
                     // Wichtig: mode:'no-cors' vermeidet CORS-Ärger; Antwort kann nicht gelesen werden,
                     // aber das Script bekommt die Daten und sendet dir die E-Mail.
-                    fetch('https://script.google.com/macros/s/AKfycbz8sVTjTnBrr0RQ3Ghbx77xT4IT6CjqfYRUJ6P747h7F4i2pHhYgDDJXCWFZ8iOJlJElw/exec', { method: 'POST', body: fd, mode: 'no-cors' });
+                    fetch('https://script.google.com/macros/s/AKfycbx4qzZkJ1FQBVG2WqfcX1MvbT7AWL8yWKLVVUTiPOpF_l7f13zgn6fL5DCeUERIsHKq-w/exec', { method: 'POST', body: fd, mode: 'no-cors' });
 
                     // Optional: Du KANNST zusätzlich Netlify Forms posten, wenn du später umstellst:
                     // await fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
@@ -674,9 +722,9 @@
 
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                    <span>${qty}× ${it.name}</span>
-                    <span>${EUR(line)}</span>
-                  </li>`
+                                <span>${qty}× ${it.name}</span>
+                                <span>${EUR(line)}</span>
+                              </li>`
                 );
             });
 
@@ -687,26 +735,26 @@
             // --- Zwischensumme + Zuschläge + Gesamt ---
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
-                  <span class="font-medium">Zwischensumme</span>
-                  <span class="font-medium">${EUR(sumItems)}</span>
-                </li>`
+                              <span class="font-medium">Zwischensumme</span>
+                              <span class="font-medium">${EUR(sumItems)}</span>
+                            </li>`
             );
 
             if (delivery > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                    <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
-                    <span>${EUR(delivery)}</span>
-                  </li>`
+                                <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+                                <span>${EUR(delivery)}</span>
+                              </li>`
                 );
             }
 
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                    <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
-                    <span>${EUR(labor)}</span>
-                  </li>`
+                                <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                                <span>${EUR(labor)}</span>
+                              </li>`
                 );
             }
 
@@ -714,9 +762,9 @@
 
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
-                  <span>Gesamt</span>
-                  <span>${EUR(total)}</span>
-                </li>`
+                              <span>Gesamt</span>
+                              <span>${EUR(total)}</span>
+                            </li>`
             );
 
             ul.innerHTML = rows.join('');
@@ -1007,20 +1055,20 @@
                 return inCat && inTxt;
             });
             catalogGrid.innerHTML = filtered.map(item => `
-                      <div class="p-0 rounded-2xl border bg-white/60 dark:bg-slate-900/60 flex flex-col overflow-hidden">
-                        ${cardImageHTML(item)}
-                        <div class="p-6 flex-1">
-                          <div class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">${item.cat}</div>
-                          <h3 class="font-semibold text-lg mt-1">${item.name}</h3>
-                          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">${item.desc || ''}</p>
-                          <div class="mt-2 text-sm text-slate-600 dark:text-slate-300"><span class="font-semibold">${money(item.price3 ?? item.day)}</span>/3 Tage · Kaution ca. ${money(item.deposit)}</div>
-                          <div class="mt-4 flex items-center gap-3">
-                            <input type="number" min="1" value="1" class="w-20 rounded-xl border px-3 py-2" aria-label="Menge" />
-                            <button type="button" class="px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 font-semibold addBtn" data-id="${item.id}">Hinzufügen</button>
-                          </div>
-                        </div>
-                      </div>
-                    `).join('');
+                                  <div class="p-0 rounded-2xl border bg-white/60 dark:bg-slate-900/60 flex flex-col overflow-hidden">
+                                    ${cardImageHTML(item)}
+                                    <div class="p-6 flex-1">
+                                      <div class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">${item.cat}</div>
+                                      <h3 class="font-semibold text-lg mt-1">${item.name}</h3>
+                                      <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">${item.desc || ''}</p>
+                                      <div class="mt-2 text-sm text-slate-600 dark:text-slate-300"><span class="font-semibold">${money(item.price3 ?? item.day)}</span>/3 Tage · Kaution ca. ${money(item.deposit)}</div>
+                                      <div class="mt-4 flex items-center gap-3">
+                                        <input type="number" min="1" value="1" class="w-20 rounded-xl border px-3 py-2" aria-label="Menge" />
+                                        <button type="button" class="px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 font-semibold addBtn" data-id="${item.id}">Hinzufügen</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                `).join('');
         }
         renderCatalog();
         document.getElementById('catalogSearch')?.addEventListener('input', renderCatalog);
@@ -1100,48 +1148,48 @@
                 const line = linePriceFor(id, qty, days);
                 rows.push(
                     `<li class="py-2 flex items-center gap-3" data-id="${id}" data-qty="${qty}">
-                    <div class="flex-1">
-                      <div class="font-medium leading-tight">${it.name}</div>
-                      <div class="text-xs text-slate-500">${qty}× ${EUR(pricePerBundle(it))} /3 Tage × ${Math.ceil(Math.max(1, days) / 3)} Pakete = <strong>${EUR(line)}</strong></div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <button class="px-2 py-1 rounded border" data-dec="${id}">−</button>
-                      <input type="number" min="0" class="w-16 rounded border px-2 py-1 qty" value="${qty}" data-q="${id}">
-                      <button class="px-2 py-1 rounded border" data-inc="${id}">+</button>
-                      <button class="px-2 py-1 rounded border text-red-600" data-del="${id}">×</button>
-                    </div>
-                  </li>`
+                                <div class="flex-1">
+                                  <div class="font-medium leading-tight">${it.name}</div>
+                                  <div class="text-xs text-slate-500">${qty}× ${EUR(pricePerBundle(it))} /3 Tage × ${Math.ceil(Math.max(1, days) / 3)} Pakete = <strong>${EUR(line)}</strong></div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                  <button class="px-2 py-1 rounded border" data-dec="${id}">−</button>
+                                  <input type="number" min="0" class="w-16 rounded border px-2 py-1 qty" value="${qty}" data-q="${id}">
+                                  <button class="px-2 py-1 rounded border" data-inc="${id}">+</button>
+                                  <button class="px-2 py-1 rounded border text-red-600" data-del="${id}">×</button>
+                                </div>
+                              </li>`
                 );
             });
 
             // Summen
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
-                  <span class="font-medium">Zwischensumme</span>
-                  <span class="font-medium">${EUR(items)}</span>
-                </li>`
+                              <span class="font-medium">Zwischensumme</span>
+                              <span class="font-medium">${EUR(items)}</span>
+                            </li>`
             );
             if (delivery > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                    <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
-                    <span>${EUR(delivery)}</span>
-                  </li>`
+                                <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+                                <span>${EUR(delivery)}</span>
+                              </li>`
                 );
             }
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                    <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
-                    <span>${EUR(labor)}</span>
-                  </li>`
+                                <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                                <span>${EUR(labor)}</span>
+                              </li>`
                 );
             }
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
-                  <span>Gesamt</span>
-                  <span>${EUR(total)}</span>
-                </li>`
+                              <span>Gesamt</span>
+                              <span>${EUR(total)}</span>
+                            </li>`
             );
 
             ul.innerHTML = rows.join('');
@@ -1188,9 +1236,9 @@
                         : (FLAT3_IDS.has(id) && days > 3 ? ' <span class="text-xs text-slate-500">(30 €/3T + Rest normal)</span>' : '');
                     rows.push(
                         `<li class="flex items-center justify-between gap-2">
-                     <span>${qty}× ${p.name}${note}</span>
-                     <span>${EUR(line)}</span>
-                   </li>`
+                                 <span>${qty}× ${p.name}${note}</span>
+                                 <span>${EUR(line)}</span>
+                               </li>`
                     );
                 }
             });
@@ -1200,9 +1248,9 @@
             // Zwischensumme (Artikel)
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t">
-                   <span class="font-medium">Zwischensumme</span>
-                   <span class="font-medium">${EUR(sumItems)}</span>
-                 </li>`
+                               <span class="font-medium">Zwischensumme</span>
+                               <span class="font-medium">${EUR(sumItems)}</span>
+                             </li>`
             );
 
             // Liefer- & Lohnkosten
@@ -1210,18 +1258,18 @@
             if (delivery > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                     <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
-                     <span>${EUR(delivery)}</span>
-                   </li>`
+                                 <span>Lieferkosten <span class="text-xs text-slate-500">(4 Fahrten)</span></span>
+                                 <span>${EUR(delivery)}</span>
+                               </li>`
                 );
             }
             const labor = computeLaborCost();
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                     <span>Lohnkosten <span class="text-xs text-slate-500">(Lieferung und Auf-/Abbau)</span></span>
-                     <span>${EUR(labor)}</span>
-                   </li>`
+                                 <span>Lohnkosten <span class="text-xs text-slate-500">(Lieferung und Auf-/Abbau)</span></span>
+                                 <span>${EUR(labor)}</span>
+                               </li>`
                 );
             }
 
@@ -1229,9 +1277,9 @@
             const total = sumItems + delivery + labor;
             rows.push(
                 `<li class="flex items-center justify-between gap-2 pt-2 mt-2 border-t font-semibold">
-                   <span>Gesamt</span>
-                   <span>${EUR(total)}</span>
-                 </li>`
+                               <span>Gesamt</span>
+                               <span>${EUR(total)}</span>
+                             </li>`
             );
 
             list.innerHTML = rows.join('');
@@ -1391,6 +1439,7 @@
         // Init
         syncAll();
     </script>
+
     <script>
         (function enableLiveSubmitGuard() {
             const form = document.getElementById('contactForm');
@@ -1445,55 +1494,6 @@
             updateSubmitState();
         })();
     </script>
-    <script>
-  // Toggle: same-day erlauben (true) oder verbieten (false)
-  const ALLOW_SAME_DAY = false;
-
-  const fromEl = document.getElementById('from');
-  const toEl   = document.getElementById('to');
-
-  // Hilfsfunktionen für lokales YYYY-MM-DD (ohne Zeitzonen-Überraschungen)
-  const toYMD = d => {
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth()+1).padStart(2,'0');
-    const dd = String(d.getDate()).padStart(2,'0');
-    return `${yyyy}-${mm}-${dd}`;
-  };
-  const addDays = (ymd, n) => {
-    const [y,m,d] = ymd.split('-').map(Number);
-    const dt = new Date(y, m-1, d);
-    dt.setDate(dt.getDate()+n);
-    return toYMD(dt);
-  };
-
-  // min = heute für "from"
-  const today = toYMD(new Date());
-  fromEl.min = today;
-
-  // Initial setzen: to = from + (ALLOW_SAME_DAY ? 0 : 1)
-  function enforceBounds() {
-    const fromVal = fromEl.value || today;
-    const minTo = addDays(fromVal, ALLOW_SAME_DAY ? 0 : 1);
-    toEl.min = minTo;
-
-    // if to < minTo → hochziehen
-    if (!toEl.value || toEl.value < minTo) {
-      toEl.value = minTo;
-    }
-  }
-
-  // Defaults beim ersten Laden
-  fromEl.value ||= today;
-  enforceBounds();
-
-  // Reagieren auf Änderungen
-  fromEl.addEventListener('change', enforceBounds);
-
-  // Optional: falls jemand versucht "to" manuell früher zu setzen
-  toEl.addEventListener('change', () => {
-    if (toEl.value < toEl.min) toEl.value = toEl.min;
-  });
-</script>
 
 
     <script src="bv-base.js"></script>
