@@ -1025,7 +1025,7 @@
             { id: 'glaeser_set', cat: 'geschirr', name: 'Gläser-Set (12 Stk.)', price3: 5, day: 5, weekend: 10, deposit: 15, img: 'assets/glaeser.jpg', desc: 'Universal.' },
             { id: 'husseBier', cat: 'Deko', name: 'Bierbank-Husse inklusive Reinigung', price3: 5, day: 5, weekend: 10, deposit: 5, img: 'assets/bhusse.jpg', desc: 'Universal.' },
             { id: 'husseSteh', cat: 'Deko', name: 'Stehtisch-Husse inklusive Reinigung', price3: 5, day: 5, weekend: 10, deposit: 5, img: 'assets/shusse.jpg', desc: 'Universal.' },
-            { id: 'husseSteh', cat: 'zelt', name: 'Zeltboden 10m²', price3: 100, day: 5, weekend: 150, deposit: 0, img: 'assets/boden.jpg', desc: 'rechtzeitig anfragen.' }
+            { id: 'zeltboden_10m2', cat: 'zelt', name: 'Zeltboden 10m²', price3: 100, day: 5, weekend: 150, deposit: 0, img: 'assets/boden.jpg', desc: 'rechtzeitig anfragen.' }
         ];
 
 
@@ -1080,7 +1080,7 @@
         function parseDate(id) { const el = document.getElementById(id); if (!el || !el.value) return null; const d = new Date(el.value + 'T00:00:00'); return isNaN(d) ? null : d; }
         function rentalDays() { const a = parseDate('fromDate'), b = parseDate('toDate'); if (!a || !b) return 1; const ms = b - a; if (ms < 0) return 1; return Math.max(1, Math.floor(ms / 86400000) + 1); }
         // ---------------------------------------------------------- Einstellen ----------------------------------------------------------
-        const FLAT3_IDS = new Set(['zelt_4x6', 'zelt_4x12', 'set_biergarnitur', 'stehtisch', 'lichterkette']);
+        const FLAT3_IDS = new Set(['zelt_4x6', 'zelt_4x12', 'set_biergarnitur', 'stehtisch', 'lichterkette', 'zeltboden_10m2']);
         // ---------------------------------------------------------- Einstellen ----------------------------------------------------------
 
 
