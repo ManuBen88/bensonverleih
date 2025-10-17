@@ -279,42 +279,96 @@
     </section>
 
 
-    <footer class="py-10">
-        <div class="mx-auto container-tight px-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <p class="text-sm text-slate-500 dark:text-slate-400">
-                © <span id="year"></span> BensonVerleih. Alle Rechte vorbehalten.
-            </p>
+      <footer class="py-12">
+  <div class="mx-auto container-tight px-4 flex flex-col gap-8">
+    <!-- obere Zeile: Copyright + Rechtliches -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        © <span id="year"></span> BensonVerleih. Alle Rechte vorbehalten.
+      </p>
 
-            <div class="text-sm text-slate-700 dark:text-slate-300">
-                <nav class="flex items-center gap-4 mb-2">
-                    <a href="#impressum" class="underline decoration-dotted">Impressum</a>
-                    <a href="#privacy" class="underline decoration-dotted">Datenschutz</a>
-                </nav>
+      <nav class="flex items-center gap-4 text-sm">
+        <a href="#impressum" class="underline decoration-dotted">Impressum</a>
+        <a href="#privacy" class="underline decoration-dotted">Datenschutz</a>
+      </nav>
+    </div>
 
-                <!-- Impressum im Footer -->
-                <section id="impressum" class="leading-relaxed">
-                    <strong>BensonVerleih</strong><br>
-                    Manuel Benson<br>
-                    <address class="not-italic">
-                        Neue Str. 2<br>
-                        29553 Bienenbüttel
-                    </address>
-                    <div class="mt-1">
-                        <strong>Umsatzsteuer-ID:</strong> DE340376350
-                    </div>
-                    <div class="mt-1">
-                        <strong>Kontakt:</strong>
-                        <a href="#contact" class="underline">Kontaktformular</a>
-                        <!-- Alternativ: Telefonnummer hier angeben -->
-                    </div>
-                    <div class="mt-1 text-slate-500 dark:text-slate-400">
-                        Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren
-                        vor einer Verbraucherschlichtungsstelle teilzunehmen (VSBG).
-                    </div>
-                </section>
+    <!-- Unsere Partner (prominent) -->
+<section aria-label="Unsere Partner"
+         class="mt-8 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 md:p-6 bg-white/80 dark:bg-slate-900/60 shadow-sm">
+  <h3 class="text-lg md:text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+    Unsere Partner
+  </h3>
+
+  <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+    <!-- Partyservice Pröhl -->
+    <li>
+      <a href="https://www.landschlachterei-pröhl.de/" target="_blank" rel="noopener noreferrer"
+         class="group block rounded-xl border border-slate-200 dark:border-slate-700 p-4 hover:shadow transition">
+        <div class="flex items-center gap-4">
+          <div class="h-12 w-28 shrink-0 bg-white dark:bg-slate-800 rounded-md grid place-items-center overflow-hidden">
+            <!-- Platzhalter: repräsentatives Bild von der Website (kein offizielles Logo gefunden) -->
+            <img src="https://www.xn--landschlachterei-prhl-zec.de/images/pictures/benutzt/AdobeStock_4727411.jpeg?h=120"
+                 alt="Partyservice Pröhl"
+                 class="h-12 w-auto object-contain">
+          </div>
+          <div>
+            <div class="text-base md:text-lg font-medium text-slate-800 dark:text-slate-100">
+              Partyservice Pröhl
             </div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">
+              Catering & Buffets aus Melbeck
+            </div>
+          </div>
         </div>
-    </footer>
+      </a>
+    </li>
+
+    <!-- Blumen-Zentrum Hoppe -->
+    <li>
+      <a href="https://www.blumen-zentrum.de/" target="_blank" rel="noopener noreferrer"
+         class="group block rounded-xl border border-slate-200 dark:border-slate-700 p-4 hover:shadow transition">
+        <div class="flex items-center gap-4">
+          <div class="h-12 w-28 shrink-0 bg-white dark:bg-slate-800 rounded-md grid place-items-center overflow-hidden">
+            <img src="https://static.wixstatic.com/media/f4cf5d_08cf031efed9444db68f05f8b3d484de~mv2.png/v1/fill/w_234,h_98,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Blumenzentrum_Raphael_Benson.png"
+                 alt="Blumen-Zentrum Hoppe"
+                 class="h-12 w-auto object-contain">
+          </div>
+          <div>
+            <div class="text-base md:text-lg font-medium text-slate-800 dark:text-slate-100">
+              Blumen-Zentrum Hoppe
+            </div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">
+              Sträuße & Floristik in Uelzen
+            </div>
+          </div>
+        </div>
+      </a>
+    </li>
+  </ul>
+</section>
+
+
+    <!-- Impressum im Footer -->
+    <section id="impressum" class="leading-relaxed text-sm text-slate-700 dark:text-slate-300">
+      <strong>BensonVerleih</strong><br>
+      Manuel Benson<br>
+      <address class="not-italic">
+        Neue Str. 2<br>
+        29553 Bienenbüttel
+      </address>
+      <div class="mt-1"><strong>Umsatzsteuer-ID:</strong> DE340376350</div>
+      <div class="mt-1">
+        <strong>Kontakt:</strong>
+        <a href="#contact" class="underline">Kontaktformular</a>
+      </div>
+      <div class="mt-1 text-slate-500 dark:text-slate-400">
+        Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren
+        vor einer Verbraucherschlichtungsstelle teilzunehmen (VSBG).
+      </div>
+    </section>
+  </div>
+</footer>
 
 
 
