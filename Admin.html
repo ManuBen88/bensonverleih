@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BensonVerleihe Admin</title>
+  <style>
+    body{font-family:system-ui;margin:0;background:#f8fafc;color:#0f172a} .wrap{max-width:1200px;margin:auto;padding:14px}
+    .card{background:#fff;border:1px solid #dbeafe;border-radius:12px;padding:12px;margin-bottom:12px}
+    table{width:100%;border-collapse:collapse} th,td{padding:8px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:14px}
+    .row{display:flex;gap:8px;flex-wrap:wrap} .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+    input,select,textarea,button{padding:8px;border:1px solid #cbd5e1;border-radius:8px} button{cursor:pointer}
+    .warn{color:#b45309;font-weight:600}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Admin · Geplante Rechnungen</h1>
+
+  <div class="card row">
+    <button onclick="loadQueue()">Aktualisieren</button>
+    <button onclick="checkStatus()">Status prüfen</button>
+    <button onclick="repairSystem()">Trigger reparieren</button>
+    <div id="sys"></div>
+  </div>
+
+  <div class="card" style="overflow:auto">
+    <table>
+      <thead><tr><th>Queue-ID</th><th>Kunde</th><th>E-Mail</th><th>Zeitraum</th><th>Fällig am</th><th>Service</th><th>Betrag</th><th>Status</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="detail" style="display:none">
+    <h3>Detail / Bearbeiten</h3>
+    <div id="warn" class="warn"></div>
+    <div class="grid" id="form"></div>
+    <label>Warenkorb JSON<textarea id="f_cart" rows="4"></textarea></label>
+    <div class="row">
+      <button onclick="previewInvoice()">Vorschau</button>
+      <button onclick="saveInvoice()">Speichern</button>
+      <button onclick="deleteQueue()">Geplante Rechnung löschen</button>
+      <button onclick="sendNow()">Rechnung sofort senden</button>
+    </div>
+    <pre id="preview"></pre>
+  </div>
+</div>
+<script>
+const TOKEN = new URLSearchParams(location.search).get('admin') || '';
+let STATE = { list: [], selected: null, selectedData: null };
+function gs(name,...args){ return new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(rej)[name](...args, TOKEN)); }
+
+async function loadQueue(){
+  const data = await gs('adminApi_listInvoiceQueue');
+  STATE.list = data.queues || [];
+  document.getElementById('sys').textContent = `Runner: ${data.runnerExists?'JA':'NEIN'} | Trigger: ${data.triggerCount} | Queues: ${STATE.list.length}`;
+  document.getElementById('rows').innerHTML = STATE.list.map(q => `<tr>
+    <td>${esc(q.queueId)}</td><td>${esc(q.customer)}</td><td>${esc(q.email)}</td><td>${esc(q.fromDate)} bis ${esc(q.toDate)}</td>
+    <td>${esc(q.dueIso)}</td><td>${esc(q.service)}</td><td>${num(q.total)} €</td><td>${esc(q.status)}</td>
+    <td><button onclick="openDetail('${attr(q.queueId)}')">Öffnen</button></td></tr>`).join('') || '<tr><td colspan="9">Keine geplanten Rechnungen.</td></tr>';
+}
+
+async function openDetail(id){
+  const d = await gs('adminApi_getQueuedInvoice', id);
+  STATE.selected = id; STATE.selectedData = d;
+  const o = d.order || {};
+  const fields = ['firstName','lastName','email','phone','fromDate','toDate','fromTime','toTime','street','zip','city','service','deliveryCost','laborCost','manualTotal'];
+  document.getElementById('form').innerHTML = fields.map(k => {
+    if(k==='service') return `<label>Service<select id="f_${k}" onchange="serviceChanged()"><option value="abholung">Abholung</option><option value="lieferung">Lieferung</option><option value="all_inclusive">All-Inclusive</option></select></label>`;
+    return `<label>${esc(k)}<input id="f_${k}" value="${attr(o[k]||'')}"></label>`;
+  }).join('');
+  document.getElementById('f_service').value = o.service || 'abholung';
+  document.getElementById('f_cart').value = JSON.stringify(o.cart||[], null, 2);
+  document.getElementById('detail').style.display='block';
+  document.getElementById('warn').textContent='';
+  document.getElementById('preview').textContent='';
+}
+function serviceChanged(){ if(document.getElementById('f_service').value==='abholung') document.getElementById('f_deliveryCost').value='0'; }
+
+async function saveInvoice(){
+  const patch = collectPatch();
+  const result = await gs('adminApi_updateQueuedInvoice', STATE.selected, patch);
+  document.getElementById('warn').textContent = result.warning || '';
+  await loadQueue();
+  alert('Gespeichert');
+}
+async function previewInvoice(){
+  const txt = await gs('adminApi_previewQueuedInvoice', STATE.selected);
+  document.getElementById('preview').textContent = txt;
+}
+async function deleteQueue(){
+  if(!confirm('Geplante Rechnung wirklich löschen?')) return;
+  await gs('adminApi_deleteQueuedInvoice', STATE.selected);
+  document.getElementById('detail').style.display='none';
+  await loadQueue();
+}
+async function sendNow(){
+  if(!confirm('Rechnung jetzt sofort senden? (echte Mail)')) return;
+  await gs('adminApi_sendQueuedInvoiceNow', STATE.selected);
+  document.getElementById('detail').style.display='none';
+  await loadQueue();
+}
+async function checkStatus(){ const s = await gs('adminApi_invoiceStatus'); alert(JSON.stringify(s,null,2)); await loadQueue(); }
+async function repairSystem(){ const s = await gs('adminApi_repairInvoiceSystem'); alert(JSON.stringify(s,null,2)); await loadQueue(); }
+
+function collectPatch(){
+  const service = document.getElementById('f_service').value;
+  return {
+    firstName:v('firstName'), lastName:v('lastName'), email:v('email'), phone:v('phone'), fromDate:v('fromDate'), toDate:v('toDate'), fromTime:v('fromTime'), toTime:v('toTime'),
+    street:v('street'), zip:v('zip'), city:v('city'), service:service, deliveryCost:v('deliveryCost'), laborCost:v('laborCost'), manualTotal:v('manualTotal'), cart: JSON.parse(document.getElementById('f_cart').value||'[]')
+  };
+}
+function v(k){ return document.getElementById('f_'+k).value; }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function attr(s){ return esc(s).replace(/`/g,'&#96;'); }
+function num(v){ return Number(v||0).toFixed(2).replace('.',','); }
+loadQueue();
+</script>
+</body>
+</html>
