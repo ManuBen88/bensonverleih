@@ -1093,10 +1093,21 @@
         function money(n) { return '€' + (Number(n) || 0).toFixed(2).replace('.', ','); }
         function cardImageHTML(item) {
             const alt = item.name || 'Artikel';
+        
             if (item.img) {
-                return `<img src="${item.img}" alt="${alt}" class="w-full h-40 object-cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-40 img-fallback',innerHTML:'<span>${alt}</span>'}))">`;
+                return `
+                    <div class="w-full h-48 bg-[#f5f1ea] flex items-center justify-center overflow-hidden">
+                        <img
+                            src="${item.img}"
+                            alt="${alt}"
+                            class="max-w-full max-h-full object-contain object-center p-3"
+                            onerror="this.parentElement.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-48 img-fallback',innerHTML:'<span>${alt}</span>'}))"
+                        >
+                    </div>
+                `;
             }
-            return `<div class="w-full h-40 img-fallback"><span>${alt}</span></div>`;
+        
+            return `<div class="w-full h-48 img-fallback"><span>${alt}</span></div>`;
         }
 
         function renderCatalog() {
