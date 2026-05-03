@@ -1091,13 +1091,39 @@
         // === Katalog rendern ===
         const catalogGrid = document.getElementById('catalogGrid');
         function money(n) { return '€' + (Number(n) || 0).toFixed(2).replace('.', ','); }
+        function escAttr(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
         function cardImageHTML(item) {
             const alt = item.name || 'Artikel';
             if (item.img) {
-                return `<img src="${item.img}" alt="${alt}" class="w-full h-40 object-cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-40 img-fallback',innerHTML:'<span>${alt}</span>'}))">`;
+                const src = escAttr(item.img);
+                const safeAlt = escAttr(alt);
+                return `<div class="relative h-44 bg-amber-50/80 dark:bg-amber-100/10 flex items-center justify-center p-3">
+                          <img src="${src}" alt="${safeAlt}" class="w-full h-full object-contain rounded-md" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-full img-fallback flex items-center justify-center',innerHTML:'<span>${safeAlt}</span>'}))">
+                          <button type="button" class="absolute right-2 bottom-2 rounded-full bg-white/95 hover:bg-white text-slate-700 border border-slate-200 w-9 h-9 flex items-center justify-center shadow" data-zoom-src="${src}" data-zoom-alt="${safeAlt}" aria-label="Bild vergrößern">🔍</button>
+                        </div>`;
             }
-            return `<div class="w-full h-40 img-fallback"><span>${alt}</span></div>`;
+            return `<div class="h-44 bg-amber-50/80 dark:bg-amber-100/10 img-fallback flex items-center justify-center"><span>${alt}</span></div>`;
         }
+
+        function ensureLightbox(){
+            if(document.getElementById('imgLightbox')) return;
+            const box = document.createElement('div');
+            box.id = 'imgLightbox';
+            box.className = 'fixed inset-0 z-[100] hidden items-center justify-center bg-black/75 p-4';
+            box.innerHTML = `<div class="relative max-w-5xl w-full flex items-center justify-center"><button type="button" id="imgLightboxClose" class="absolute -top-2 -right-2 bg-white text-slate-800 rounded-full w-10 h-10 text-xl" aria-label="Schließen">×</button><img id="imgLightboxImg" src="" alt="" class="max-h-[85vh] w-auto max-w-full object-contain rounded-lg bg-white p-2" /></div>`;
+            document.body.appendChild(box);
+            box.addEventListener('click', (e)=>{ if(e.target===box) closeLightbox(); });
+            box.querySelector('#imgLightboxClose').addEventListener('click', closeLightbox);
+            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLightbox(); });
+        }
+        function openLightbox(src, alt){
+            ensureLightbox();
+            const box = document.getElementById('imgLightbox');
+            box.querySelector('#imgLightboxImg').src = src;
+            box.querySelector('#imgLightboxImg').alt = alt || 'Produktbild';
+            box.classList.remove('hidden'); box.classList.add('flex');
+        }
+        function closeLightbox(){ const box=document.getElementById('imgLightbox'); if(!box) return; box.classList.add('hidden'); box.classList.remove('flex'); }
 
         function renderCatalog() {
             const q = (document.getElementById('catalogSearch')?.value || '').toLowerCase();
@@ -1127,6 +1153,12 @@
         renderCatalog();
         document.getElementById('catalogSearch')?.addEventListener('input', renderCatalog);
         document.getElementById('catalogFilter')?.addEventListener('change', renderCatalog);
+        catalogGrid?.addEventListener('click', (ev) => {
+            const btn = ev.target.closest('[data-zoom-src]');
+            if (!btn) return;
+            openLightbox(btn.getAttribute('data-zoom-src') || '', btn.getAttribute('data-zoom-alt') || '');
+        });
+        ensureLightbox();
 
         // === Warenkorb & Berechnung ===
         const cart = (window.cart ||= new Map());
