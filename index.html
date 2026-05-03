@@ -16,6 +16,20 @@
     .bg-grid{background-image:radial-gradient(rgba(0,0,0,.06) 1px,transparent 1px);background-size:18px 18px}
     .img-fallback{background:linear-gradient(135deg,#e2e8f0,#f8fafc);display:flex;align-items:center;justify-content:center;color:#475569;font-weight:700}
     .img-fallback span{padding:.25rem .5rem;border-radius:.5rem;background:rgba(255,255,255,.7)}
+    .product-image-box{background:#f5f1ea}
+    .product-image-zoom{position:absolute;right:.75rem;bottom:.75rem;width:2.35rem;height:2.35rem;border-radius:9999px;display:grid;place-items:center;color:#0f172a;background:rgba(255,255,255,.94);border:1px solid rgba(15,23,42,.12);box-shadow:0 10px 24px rgba(15,23,42,.18);transition:transform .18s ease,background .18s ease,box-shadow .18s ease}
+    .product-image-zoom:hover,.product-image-zoom:focus-visible{transform:translateY(-1px) scale(1.04);background:#fff;box-shadow:0 14px 30px rgba(15,23,42,.22);outline:2px solid rgba(37,99,235,.35);outline-offset:2px}
+    #productLightbox[hidden]{display:none}
+    #productLightbox{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(15,23,42,.78);backdrop-filter:blur(4px)}
+    .product-lightbox-dialog{position:relative;max-width:min(92vw,980px);max-height:90vh}
+    #productLightboxImg{display:block;max-width:min(92vw,980px);max-height:82vh;width:auto;height:auto;object-fit:contain;background:#f5f1ea;border-radius:1rem;box-shadow:0 25px 80px rgba(0,0,0,.35)}
+    #productLightboxCaption{margin-top:.75rem;text-align:center;color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+    .product-lightbox-close{position:absolute;top:-.85rem;right:-.85rem;width:2.5rem;height:2.5rem;border-radius:9999px;display:grid;place-items:center;background:#fff;color:#0f172a;border:1px solid rgba(15,23,42,.12);box-shadow:0 12px 28px rgba(0,0,0,.24)}
+    .product-lightbox-close:hover,.product-lightbox-close:focus-visible{outline:2px solid rgba(37,99,235,.45);outline-offset:2px}
+    @media (max-width: 640px){
+      .product-lightbox-close{top:.5rem;right:.5rem}
+      #productLightboxImg{max-height:78vh}
+    }
     @media (max-width: 1023px){
       #miniCartTopRight{bottom:1.25rem;right:1rem;left:auto;top:auto;width:auto;max-width:calc(100% - 2rem)}
       #miniCartPanel{width:100%}
@@ -370,6 +384,20 @@
   </div>
 </footer>
 
+
+
+    <div id="productLightbox" role="dialog" aria-modal="true" aria-label="Produktbild vergroessert" hidden>
+        <div class="product-lightbox-dialog" role="document">
+            <button id="productLightboxClose" type="button" class="product-lightbox-close" aria-label="Produktbild schliessen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                </svg>
+            </button>
+            <img id="productLightboxImg" src="" alt="">
+            <div id="productLightboxCaption"></div>
+        </div>
+    </div>
 
 
     <!-- Google Maps JS (Distance Matrix) -->
@@ -1091,23 +1119,46 @@
         // === Katalog rendern ===
         const catalogGrid = document.getElementById('catalogGrid');
         function money(n) { return '€' + (Number(n) || 0).toFixed(2).replace('.', ','); }
+        function escapeAttr(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[ch]));
+        }
         function cardImageHTML(item) {
             const alt = item.name || 'Artikel';
-        
+
             if (item.img) {
+                const img = escapeAttr(item.img);
+                const safeAlt = escapeAttr(alt);
                 return `
-                    <div class="w-full h-48 bg-[#f5f1ea] flex items-center justify-center overflow-hidden">
+                    <div class="product-image-box relative w-full h-48 flex items-center justify-center overflow-hidden">
                         <img
-                            src="${item.img}"
-                            alt="${alt}"
-                            class="max-w-full max-h-full object-contain object-center p-3"
-                            onerror="this.parentElement.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-48 img-fallback',innerHTML:'<span>${alt}</span>'}))"
+                            src="${img}"
+                            alt="${safeAlt}"
+                            class="w-full h-full object-contain object-center p-3"
+                            onerror="const box=this.closest('.product-image-box');const fallback=document.createElement('div');fallback.className='w-full h-48 img-fallback';const label=document.createElement('span');label.textContent=this.alt||'Artikel';fallback.appendChild(label);box.replaceWith(fallback)"
                         >
+                        <button
+                            type="button"
+                            class="product-image-zoom"
+                            aria-label="Produktbild von ${safeAlt} vergroessern"
+                            data-lightbox-src="${img}"
+                            data-lightbox-alt="${safeAlt}"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <path d="m20 20-3.5-3.5"></path>
+                            </svg>
+                        </button>
                     </div>
                 `;
             }
-        
-            return `<div class="w-full h-48 img-fallback"><span>${alt}</span></div>`;
+
+            return `<div class="w-full h-48 img-fallback"><span>${escapeAttr(alt)}</span></div>`;
         }
 
         function renderCatalog() {
@@ -1138,6 +1189,49 @@
         renderCatalog();
         document.getElementById('catalogSearch')?.addEventListener('input', renderCatalog);
         document.getElementById('catalogFilter')?.addEventListener('change', renderCatalog);
+
+        // === Produktbild-Lightbox ===
+        const productLightbox = document.getElementById('productLightbox');
+        const productLightboxImg = document.getElementById('productLightboxImg');
+        const productLightboxCaption = document.getElementById('productLightboxCaption');
+        const productLightboxClose = document.getElementById('productLightboxClose');
+
+        function openProductLightbox(src, alt) {
+            if (!productLightbox || !productLightboxImg) return;
+            productLightboxImg.src = src;
+            productLightboxImg.alt = alt || 'Produktbild';
+            if (productLightboxCaption) productLightboxCaption.textContent = alt || '';
+            productLightbox.hidden = false;
+            document.documentElement.classList.add('overflow-hidden');
+            productLightboxClose?.focus({ preventScroll: true });
+        }
+
+        function closeProductLightbox() {
+            if (!productLightbox || productLightbox.hidden) return;
+            productLightbox.hidden = true;
+            if (productLightboxImg) {
+                productLightboxImg.removeAttribute('src');
+                productLightboxImg.alt = '';
+            }
+            if (productLightboxCaption) productLightboxCaption.textContent = '';
+            document.documentElement.classList.remove('overflow-hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            const zoomBtn = e.target.closest('[data-lightbox-src]');
+            if (!zoomBtn) return;
+            e.preventDefault();
+            e.stopPropagation();
+            openProductLightbox(zoomBtn.dataset.lightboxSrc, zoomBtn.dataset.lightboxAlt);
+        });
+
+        productLightbox?.addEventListener('click', (e) => {
+            if (e.target === productLightbox) closeProductLightbox();
+        });
+        productLightboxClose?.addEventListener('click', closeProductLightbox);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeProductLightbox();
+        });
 
         // === Warenkorb & Berechnung ===
         const cart = (window.cart ||= new Map());
