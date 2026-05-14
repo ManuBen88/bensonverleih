@@ -414,7 +414,7 @@
         window.LABOR_TENT_LARGE ??= 100;
 
         /* ===== Liefer-Konstanten ===== */
-        window.RATE_PER_KM ??= 0.45;
+        window.RATE_PER_KM ??= 0.55;
         window.TRIPS_FACTOR ??= 4; // 4 Fahrten
 
 
@@ -884,7 +884,7 @@
 
         (function () {
             const ORIGIN = "Neue Str. 2, 29553 Bienenbüttel";
-            const RATE_PER_KM = 0.45;
+            const RATE_PER_KM = 0.55;
 
             const serviceSel = document.getElementById('service');
             const deliveryBox = document.getElementById('deliveryExtras');
@@ -1282,7 +1282,7 @@
         }
 
 
-        function deliveryCost() { const mode = document.getElementById('delivery')?.value || 'pickup'; if (mode !== 'delivery') return 0; const km = parseFloat(document.getElementById('kmInput')?.value || '0') || 0; const back = document.getElementById('returnTrip')?.checked ? 2 : 1; return km * 0.45 * back; }
+        function deliveryCost() { const mode = document.getElementById('delivery')?.value || 'pickup'; if (mode !== 'delivery') return 0; const km = parseFloat(document.getElementById('kmInput')?.value || '0') || 0; const back = document.getElementById('returnTrip')?.checked ? 2 : 1; return km * 0.55 * back; }
 
         function renderMiniList() {
             const ul = document.getElementById('miniCartList');
