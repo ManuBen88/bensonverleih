@@ -510,7 +510,9 @@
             if (!serviceSel || !deliveryBox) return;
 
             function setDeliveryCost(cost, km) {
-                const rounded = window.roundUp5(cost);
+                const service = serviceSel?.value || 'pickup';
+                const allowsDelivery = service === 'delivery' || service === 'all_inclusive';
+                const rounded = window.roundUp5(allowsDelivery ? cost : 0);
                 if (delEstEl) delEstEl.textContent = window.EUR(rounded);
                 if (hiddenCost) hiddenCost.value = String(rounded);
                 if (typeof km === 'number' && hiddenKm) hiddenKm.value = km.toFixed(1);
@@ -676,10 +678,14 @@
                 });
                 document.getElementById('cartInput')?.setAttribute('value', JSON.stringify(obj));
 
-                const delivery = Number(document.getElementById('deliveryCost')?.value || 0);
+                const selectedService = document.getElementById('service')?.value || 'pickup';
+                const allowsDelivery = selectedService === 'delivery' || selectedService === 'all_inclusive';
+                const deliveryInput = document.getElementById('deliveryCost');
+                if (!allowsDelivery && deliveryInput) deliveryInput.value = '0';
+                const delivery = allowsDelivery ? Number(deliveryInput?.value || 0) : 0;
                 const labor = (typeof computeLaborCost === 'function') ? computeLaborCost() : 0;
                 document.getElementById('totalInput')?.setAttribute('value', String(sumItems + delivery + labor));
-                document.getElementById('serviceHidden')?.setAttribute('value', document.getElementById('service')?.value || 'pickup');
+                document.getElementById('serviceHidden')?.setAttribute('value', selectedService);
 
                 // 2) Jetzt an dein Apps Script schicken (läuft lokal & online)
                 const fd = new FormData(form);
@@ -811,7 +817,8 @@
             });
 
             // --- Zuschläge konsistent runden/verwenden ---
-            const delivery = round5(Number(deliveryRaw || 0));
+            const allowsDelivery = svc === 'delivery' || svc === 'all_inclusive';
+            const delivery = allowsDelivery ? round5(Number(deliveryRaw || 0)) : 0;
             const labor = Number(laborRaw || 0);
 
             // --- Zwischensumme + Zuschläge + Gesamt ---
@@ -916,7 +923,9 @@
 
             // Set cost display + hidden fields
             function setDeliveryCost(cost, km) {
-                const rounded = roundUp5(cost);           // auf 5 € runden (aufwärts)
+                const service = serviceSel?.value || 'pickup';
+                const allowsDelivery = service === 'delivery' || service === 'all_inclusive';
+                const rounded = roundUp5(allowsDelivery ? cost : 0); // auf 5 € runden (aufwärts)
                 delEstEl.textContent = EUR(rounded);
                 document.getElementById('deliveryCost').value = String(rounded);
                 if (typeof km === 'number') {
@@ -942,6 +951,11 @@
 
             // Google Distance Matrix
             function calcDistance() {
+                const service = serviceSel?.value || 'pickup';
+                if (service !== 'delivery' && service !== 'all_inclusive') {
+                    setDeliveryCost(0);
+                    return;
+                }
                 if (!window.google || !google.maps) return; // API not loaded
                 const dest = [document.getElementById('street').value, document.getElementById('zip').value, document.getElementById('city').value]
                     .map(s => String(s || '').trim()).filter(Boolean).join(', ');
@@ -1269,14 +1283,17 @@
                 deposit += (Number(it.deposit) || 0) * qty;
             });
 
-            const delivery = (typeof getDeliveryNow === 'function')
-                ? getDeliveryNow()
-                : Number(document.getElementById('deliveryCost')?.value || 0);
+            const svc = (document.getElementById('service')?.value || document.getElementById('serviceHidden')?.value || 'pickup').toLowerCase();
+            const allowsDelivery = svc === 'delivery' || svc === 'all_inclusive';
+            const delivery = allowsDelivery
+                ? ((typeof getDeliveryNow === 'function')
+                    ? getDeliveryNow()
+                    : Number(document.getElementById('deliveryCost')?.value || 0))
+                : 0;
 
             const labor = (typeof computeLaborCost === 'function') ? computeLaborCost() : 0;
 
             const total = items + delivery + labor;
-            const svc = (document.getElementById('serviceHidden')?.value || document.getElementById('service')?.value || 'pickup').toLowerCase();
             const showDeposit = (svc === 'pickup') && deposit > 0;
 
             return { items, deposit, delivery, labor, total, days, showDeposit };
@@ -1366,6 +1383,8 @@
         // Helper: nimmt die (schon gerundeten) Lieferkosten aus dem Hidden-Feld.
         // Wenn roundUp5 schon woanders angewendet wurde, ist das idempotent.
         function getDeliveryNow() {
+            const service = (document.getElementById('service')?.value || document.getElementById('serviceHidden')?.value || 'pickup').toLowerCase();
+            if (service !== 'delivery' && service !== 'all_inclusive') return 0;
             const raw = Number(document.getElementById('deliveryCost')?.value || 0);
             return (typeof roundUp5 === 'function') ? roundUp5(raw) : raw;
         }
@@ -1476,14 +1495,16 @@
         // Nimmt die bereits gerundeten Lieferkosten aus dem Hidden-Feld (id="deliveryCost")
         // und rundet zur Sicherheit nochmal auf 5 € (idempotent, falls roundUp5 schon angewendet wurde).
         function getDeliveryNow() {
+            const service = (document.getElementById('service')?.value || document.getElementById('serviceHidden')?.value || 'pickup').toLowerCase();
+            if (service !== 'delivery' && service !== 'all_inclusive') return 0;
             const raw = Number(document.getElementById('deliveryCost')?.value || 0);
             return (typeof roundUp5 === 'function') ? roundUp5(raw) : raw;
         }
 
         function currentService() {
-            const h = document.getElementById('serviceHidden')?.value?.toLowerCase().trim();
-            if (h) return h;
-            return (document.getElementById('service')?.value || 'pickup').toLowerCase().trim();
+            const selected = document.getElementById('service')?.value?.toLowerCase().trim();
+            if (selected) return selected;
+            return (document.getElementById('serviceHidden')?.value || 'pickup').toLowerCase().trim();
         }
         function isPickup() { return currentService() === 'pickup'; }
 
