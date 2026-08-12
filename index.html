@@ -872,7 +872,7 @@
             // WICHTIG: exakt dieselbe Instanz wie oben verwenden (nicht window.cart || new Map())
             cart.forEach((qty, id) => {
                 if (qty <= 0) return;
-                if (id === 'zelt_4x6') labor += 40 * qty; // kleines Zelt
+                if (id === 'zelt_4x6' || id === 'zelt_5x6') labor += 40 * qty; // kleine Zelte
                 if (id === 'zelt_4x12') labor += 100 * qty; // großes Zelt
             });
 
@@ -1099,6 +1099,7 @@
         // === Produktdaten + schneller Index ===
         window.ITEMS = [
             { id: 'zelt_4x6', cat: 'zelt', name: 'Party-Zelt 4×6 m', price3: 30, day: 30, weekend: 35, deposit: 100, img: 'assets/zelt-klein.jpg', desc: 'Seitenwände inkl.' },
+            { id: 'zelt_5x6', cat: 'zelt', name: 'Party-Zelt 5×6 m', price3: 30, day: 30, weekend: 35, deposit: 100, img: 'assets/zelt-klein.jpg', desc: 'Seitenwände inkl.' },
             { id: 'zelt_4x12', cat: 'zelt', name: 'Party-Zelt 4×12 m', price3: 85, day: 85, weekend: 100, deposit: 150, img: 'assets/zelt-rampen.jpg', desc: 'Großes Zelt, Seitenwände inkl.' },
             { id: 'set_biergarnitur', cat: 'moebel', name: 'Bierzeltgarnitur (Tisch 220×70 + 2 Bänke)', price3: 10, day: 10, weekend: 12, deposit: 30, img: 'assets/biergarnitur.jpg', desc: 'Für 6–8 Personen.' },
             { id: 'stehtisch', cat: 'moebel', name: 'Stehtisch Ø70 cm', price3: 5, day: 5, weekend: 7, deposit: 50, img: 'assets/stehtisch.jpg', desc: 'Klapptisch, Husse optional.' },
@@ -1239,7 +1240,7 @@
         function parseDate(id) { const el = document.getElementById(id); if (!el || !el.value) return null; const d = new Date(el.value + 'T00:00:00'); return isNaN(d) ? null : d; }
         function rentalDays() { const a = parseDate('fromDate'), b = parseDate('toDate'); if (!a || !b) return 1; const ms = b - a; if (ms < 0) return 1; return Math.max(1, Math.floor(ms / 86400000) + 1); }
         // ---------------------------------------------------------- Einstellen ----------------------------------------------------------
-        const FLAT3_IDS = new Set(['zelt_4x6', 'zelt_4x12', 'set_biergarnitur', 'stehtisch', 'lichterkette', 'zeltboden_10m2']);
+        const FLAT3_IDS = new Set(['zelt_4x6', 'zelt_5x6', 'zelt_4x12', 'set_biergarnitur', 'stehtisch', 'lichterkette', 'zeltboden_10m2']);
         // ---------------------------------------------------------- Einstellen ----------------------------------------------------------
 
 
