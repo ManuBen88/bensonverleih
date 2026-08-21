@@ -229,4 +229,3 @@ function rentalDays_(from,to){ const a=new Date(from+'T00:00:00'); const b=new D
 function overlaps_(a1,a2,b1,b2){ return !(a2 < b1 || a1 > b2); }
 function toIso_(ms){ if(!ms) return ''; return Utilities.formatDate(new Date(ms), TZ, "yyyy-MM-dd'T'HH:mm:ssXXX"); }
 function nextInvoiceNo_(commit){ const p=PropertiesService.getScriptProperties(); const k='INVOICE_SEQ'; const n=(parseInt(p.getProperty(k)||'1000',10)||1000)+1; if(commit) p.setProperty(k, String(n)); return 'BV-'+n; }
-
