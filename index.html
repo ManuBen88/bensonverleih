@@ -133,7 +133,9 @@
                     <input type="hidden" id="totalInput" name="total" />
                     <input type="hidden" id="distanceKm" name="distance_km" />
                     <input type="hidden" id="deliveryCost" name="delivery_cost" />
+                    <input type="hidden" id="laborCost" name="labor_cost" />
                     <input type="hidden" id="serviceHidden" name="service" />
+                    <input type="hidden" id="tentHelperLabel" name="tent_helper_label" />
 
                     <div class="grid md:grid-cols-2 gap-6">
 
@@ -222,6 +224,16 @@
                                 <option value="pickup">Abholung</option>
                             </select>
                             <p class="mt-1 text-xs text-slate-500">Lieferung & Aufbau berechnen die Entfernung mit Google Maps.</p>
+                        </div>
+
+                        <div id="tentHelperOptions" class="md:col-span-2 hidden">
+                            <label class="block text-sm font-medium" for="tentHelper">Helfer beim Zelt-Auf-/Abbau</label>
+                            <select id="tentHelper" name="tent_helper" class="mt-1 w-full rounded-xl border px-3 py-2">
+                                <option value="setup_and_teardown">1 Helfer beim Aufbau und Abbau – 40 € Lohnkosten je Zelt</option>
+                                <option value="setup_only">1 Helfer nur beim Aufbau – 60 € Lohnkosten je Zelt</option>
+                                <option value="none">Kein Helfer – 80 € Lohnkosten je Zelt</option>
+                            </select>
+                            <p class="mt-1 text-xs text-slate-500">Diese Auswahl gilt nur für Zelte und wird nur beim Service „Lieferung und Auf-/Abbau“ berechnet.</p>
                         </div>
 
 
@@ -409,9 +421,11 @@
         window.roundUp5 ??= (v => Math.ceil((v || 0) / 5) * 5);
 
         /* ===== Lohnkosten-Konstanten (nur setzen, wenn nicht vorhanden) ===== */
-        window.LABOR_ALL_INCLUSIVE ??= 22;
-        window.LABOR_TENT_6x4 ??= 40;
-        window.LABOR_TENT_LARGE ??= 100;
+        window.TENT_HELPER_LABOR ??= {
+            setup_and_teardown: 40,
+            setup_only: 60,
+            none: 80
+        };
 
         /* ===== Liefer-Konstanten ===== */
         window.RATE_PER_KM ??= 0.55;
@@ -466,7 +480,7 @@
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                                <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                                <span>Lohnkosten <span class="text-xs text-slate-500">(${tentHelperLaborLabel()})</span></span>
                                 <span>${EUR(labor)}</span>
                               </li>`
                 );
@@ -522,7 +536,7 @@
                 const km = Math.max(0, parseFloat(kmInput?.value || '0'));
                 const cost = km * window.RATE_PER_KM * window.TRIPS_FACTOR;
                 setDeliveryCost(cost, km);
-                updateEstimatesUI?.();
+                window.updateEstimatesUI?.();
                 const deliveryNow = Number(hiddenCost?.value || 0);
                 renderSideCartExtra(deliveryNow, computeLaborCost());
                 if (typeof window.renderMini === 'function') window.renderMini();
@@ -545,7 +559,7 @@
                 } else {
                     deliveryBox.classList.add('hidden');
                     setDeliveryCost(0, 0);
-                    updateEstimatesUI?.();
+                    window.updateEstimatesUI?.();
                     renderSideCartExtra(0, computeLaborCost());
                     if (typeof window.renderMini === 'function') window.renderMini();
                     return;
@@ -570,7 +584,7 @@
                     const km = (elem.distance.value || 0) / 1000;
                     const cost = km * window.RATE_PER_KM * window.TRIPS_FACTOR;
                     setDeliveryCost(cost, km);
-                    updateEstimatesUI?.();
+                    window.updateEstimatesUI?.();
 
                     const deliveryNow = Number(hiddenCost?.value || 0);
                     renderSideCartExtra(deliveryNow, computeLaborCost());
@@ -585,11 +599,11 @@
                 if (val === 'delivery' || val === 'all_inclusive') {
                     deliveryBox.classList.remove('hidden');
                     calcDistance();
-                    updateEstimatesUI?.();
+                    window.updateEstimatesUI?.();
                 } else {
                     deliveryBox.classList.add('hidden');
                     setDeliveryCost(0, 0);
-                    updateEstimatesUI?.();
+                    window.updateEstimatesUI?.();
                     renderSideCartExtra(0, computeLaborCost());
                     if (typeof window.renderMini === 'function') window.renderMini();
                 }
@@ -668,12 +682,10 @@
                 };
 
                 // 1) Warenkorb & Summen in Hidden-Felder schreiben
-                const obj = {}; let sumItems = 0;
+                const obj = {};
                 (window.cart || new Map()).forEach((qty, id) => {
                     if (qty > 0) {
                         obj[id] = qty;
-                        const it = (window.ITEMS || []).find(x => x.id === id);
-                        if (it) sumItems += (it.day || 0) * qty; // falls du eine eigene Preisfunktion hast, hier einsetzen
                     }
                 });
                 document.getElementById('cartInput')?.setAttribute('value', JSON.stringify(obj));
@@ -682,10 +694,11 @@
                 const allowsDelivery = selectedService === 'delivery' || selectedService === 'all_inclusive';
                 const deliveryInput = document.getElementById('deliveryCost');
                 if (!allowsDelivery && deliveryInput) deliveryInput.value = '0';
-                const delivery = allowsDelivery ? Number(deliveryInput?.value || 0) : 0;
-                const labor = (typeof computeLaborCost === 'function') ? computeLaborCost() : 0;
-                document.getElementById('totalInput')?.setAttribute('value', String(sumItems + delivery + labor));
                 document.getElementById('serviceHidden')?.setAttribute('value', selectedService);
+                updateTentHelperVisibility();
+                const totals = computeTotals();
+                document.getElementById('laborCost')?.setAttribute('value', String(totals.labor));
+                document.getElementById('totalInput')?.setAttribute('value', String(totals.total));
 
                 // 2) Jetzt an dein Apps Script schicken (läuft lokal & online)
                 const fd = new FormData(form);
@@ -756,7 +769,7 @@
                     deliveryBox?.classList.remove('hidden');
                     if (typeof calcDistance === 'function') {
                         calcDistance(); // setzt deliveryCost & deliveryEstimate
-                        updateEstimatesUI?.();
+                        window.updateEstimatesUI?.();
                     } else {
                         updateQuotePanels(); // fallback
                     }
@@ -841,7 +854,7 @@
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                                <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                                <span>Lohnkosten <span class="text-xs text-slate-500">(${tentHelperLaborLabel()})</span></span>
                                 <span>${EUR(labor)}</span>
                               </li>`
                 );
@@ -869,21 +882,50 @@
 
 
 
-        function computeLaborCost() {
-            // nur bei All inclusive
-            const service = (document.getElementById('serviceHidden')?.value || document.getElementById('service')?.value || '').toLowerCase();
-            if (service !== 'all_inclusive') return 0;
+        function isTentItem(id) {
+            return String(id || '').startsWith('zelt_');
+        }
 
-            let labor = 5; // Grundpauschale (dein aktueller Wert)
-
-            // WICHTIG: exakt dieselbe Instanz wie oben verwenden (nicht window.cart || new Map())
-            cart.forEach((qty, id) => {
-                if (qty <= 0) return;
-                if (id === 'zelt_4x6' || id === 'zelt_5x6') labor += 40 * qty; // kleine Zelte
-                if (id === 'zelt_4x12') labor += 100 * qty; // großes Zelt
+        function tentQuantity() {
+            let quantity = 0;
+            (window.cart || new Map()).forEach((qty, id) => {
+                if (qty > 0 && isTentItem(id)) quantity += qty;
             });
+            return quantity;
+        }
 
-            return labor;
+        function selectedTentHelperMode() {
+            const mode = document.getElementById('tentHelper')?.value || 'setup_and_teardown';
+            return Object.prototype.hasOwnProperty.call(window.TENT_HELPER_LABOR, mode)
+                ? mode
+                : 'setup_and_teardown';
+        }
+
+        function tentHelperLaborLabel() {
+            const labels = {
+                setup_and_teardown: '1 Helfer bei Aufbau und Abbau',
+                setup_only: '1 Helfer nur beim Aufbau',
+                none: 'ohne Helfer'
+            };
+            return labels[selectedTentHelperMode()];
+        }
+
+        function updateTentHelperVisibility() {
+            const box = document.getElementById('tentHelperOptions');
+            const select = document.getElementById('tentHelper');
+            const hiddenLabel = document.getElementById('tentHelperLabel');
+            const visible = currentService() === 'all_inclusive' && tentQuantity() > 0;
+
+            box?.classList.toggle('hidden', !visible);
+            if (select) select.required = visible;
+            if (hiddenLabel) hiddenLabel.value = visible ? tentHelperLaborLabel() : '';
+        }
+
+        function computeLaborCost() {
+            if (currentService() !== 'all_inclusive') return 0;
+            const quantity = tentQuantity();
+            if (!quantity) return 0;
+            return window.TENT_HELPER_LABOR[selectedTentHelperMode()] * quantity;
         }
 
 
@@ -913,11 +955,11 @@
                 if (val === 'delivery' || val === 'all_inclusive') {
                     deliveryBox.classList.remove('hidden');
                     calcDistance(); // try to auto-calc
-                    updateEstimatesUI?.();
+                    window.updateEstimatesUI?.();
                 } else {
                     deliveryBox.classList.add('hidden');
                     setDeliveryCost(0);
-                    updateEstimatesUI?.();
+                    window.updateEstimatesUI?.();
                 }
             }
 
@@ -978,7 +1020,7 @@
                     else {
                         renderMainList();
                         renderMiniList?.();
-                        updateEstimatesUI?.();
+                        window.updateEstimatesUI?.();
                     }
                 });
             }
@@ -1357,7 +1399,7 @@
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                                <span>Lohnkosten <span class="text-xs text-slate-500">(All inclusive)</span></span>
+                                <span>Lohnkosten <span class="text-xs text-slate-500">(${tentHelperLaborLabel()})</span></span>
                                 <span>${EUR(labor)}</span>
                               </li>`
                 );
@@ -1446,7 +1488,7 @@
             if (labor > 0) {
                 rows.push(
                     `<li class="flex items-center justify-between gap-2">
-                                 <span>Lohnkosten <span class="text-xs text-slate-500">(Lieferung und Auf-/Abbau)</span></span>
+                                 <span>Lohnkosten <span class="text-xs text-slate-500">(${tentHelperLaborLabel()})</span></span>
                                  <span>${EUR(labor)}</span>
                                </li>`
                 );
@@ -1510,7 +1552,8 @@
 
         function updateEstimatesUI() {
             // Nur Hidden-Feld aktualisieren; Anzeige macht renderSideCartExtra()
-            const { total } = computeTotals();
+            const { labor, total } = computeTotals();
+            document.getElementById('laborCost')?.setAttribute('value', String(labor));
             document.getElementById('totalInput')?.setAttribute('value', String(total));
         }
 
@@ -1546,6 +1589,7 @@
             syncAll();
         }
         function syncAll() {
+            updateTentHelperVisibility();
             renderMiniList();
             // NEU: SideCart mit korrekten Zusatzkosten rendern:
             const deliveryNow = (typeof getDeliveryNow === 'function') ? getDeliveryNow() : Number(document.getElementById('deliveryCost')?.value || 0);
@@ -1581,7 +1625,7 @@
         })();
 
         // Live-Recalc for estimation inputs
-        ['fromDate', 'toDate', 'delivery', 'kmInput', 'returnTrip'].forEach(id => {
+        ['fromDate', 'toDate', 'delivery', 'kmInput', 'returnTrip', 'tentHelper'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 const evt = (el.type === 'checkbox' || el.tagName === 'SELECT') ? 'change' : 'input';
@@ -1612,7 +1656,7 @@
 
             // Alles neu kalkulieren (damit die Kaution sofort sichtbar wird)
             if (typeof syncAll === 'function') syncAll();
-            else { renderMainList?.(); renderMiniList?.(); updateEstimatesUI?.(); }
+            else { renderMainList?.(); renderMiniList?.(); window.updateEstimatesUI?.(); }
 
         });
 
@@ -1676,7 +1720,6 @@
         })();
     </script>
 
-
-    <script src="bv-base.js"></script>
 </body>
 </html>
+
