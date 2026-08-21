@@ -1,6 +1,6 @@
 const ORDER_SHEET_NAME = 'Auftraege';
 const ORDER_COLUMNS = [
-  'orderId','status','createdAt','updatedAt','firstName','lastName','email','phone','fromDate','toDate','fromTime','toTime','street','zip','city','service','serviceLabel','cartJson','distanceKm','deliveryCost','laborCost','itemsSubtotal','total','calendarEventId','invoiceQueueId','invoiceStatus','invoiceNo','invoiceSentAt','notes','adminNotes','unknownItemsJson','manualTotal','manualTotalReason'
+  'orderId','status','createdAt','updatedAt','firstName','lastName','email','phone','fromDate','toDate','fromTime','toTime','street','zip','city','service','serviceLabel','cartJson','distanceKm','deliveryCost','laborCost','itemsSubtotal','total','calendarEventId','invoiceQueueId','invoiceStatus','invoiceNo','invoiceSentAt','notes','adminNotes','unknownItemsJson','manualTotal','manualTotalReason','tentHelper','tentHelperLabel'
 ];
 const ORDER_STATUSES = { request:'request', confirmed:'confirmed', declined:'declined', cancelled:'cancelled' };
 const INVOICE_STATUSES = { none:'none', queued:'queued', sent:'sent', cancelled:'cancelled', error:'error' };
@@ -41,6 +41,8 @@ function doPost(e) {
 
 function normalizeService(value){ const v=String(value||'').toLowerCase().trim().replace(/[\s-]+/g,'_'); if(/abholung|pickup|pick_up|selbstabholung/.test(v)) return 'abholung'; if(/lieferung|delivery/.test(v)) return 'lieferung'; if(/all_inclusive|allinclusive|aufbau|auf_und_abbau/.test(v)) return 'all_inclusive'; return 'abholung'; }
 function serviceLabel(service){ const s=normalizeService(service); return s==='lieferung'?'Lieferung':(s==='all_inclusive'?'All-Inclusive':'Abholung'); }
+function normalizeTentHelper_(value){ const v=String(value||'').toLowerCase().trim().replace(/[\s-]+/g,'_'); if(v==='setup_only'||v==='nur_aufbau') return 'setup_only'; if(v==='none'||v==='kein_helfer'||v==='ohne_helfer') return 'none'; return 'setup_and_teardown'; }
+function tentHelperLabel_(value){ const v=normalizeTentHelper_(value); return v==='setup_only'?'1 Helfer nur beim Aufbau':(v==='none'?'Ohne Helfer':'1 Helfer bei Aufbau und Abbau'); }
 function escapeHtml(value){ return String(value==null?'':value).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 function escapeAttr(value){ return escapeHtml(value).replace(/`/g,'&#96;'); }
 
@@ -57,6 +59,7 @@ function sanitizeOrderInput(raw){
     orderId: safeText_(raw.orderId), firstName:safeText_(raw.firstName), lastName:safeText_(raw.lastName), email:sanitizeEmail_(raw.email), phone:safeText_(raw.phone),
     fromDate:fromDate, toDate:toDate, fromTime:safeText_(raw.fromTime), toTime:safeText_(raw.toTime), street:safeText_(raw.street), zip:safeText_(raw.zip), city:safeText_(raw.city),
     service:service, serviceLabel:serviceLabel(service), cart:cart, distanceKm:toNumber_(raw.distanceKm), deliveryCost:toNumber_(raw.deliveryCost), laborCost:toNumber_(raw.laborCost),
+    tentHelper:normalizeTentHelper_(raw.tentHelper||raw.tent_helper), tentHelperLabel:'',
     notes:safeText_(raw.notes), adminNotes:safeText_(raw.adminNotes), unknownItems:unknownItems, manualTotal: raw.manualTotal===''||raw.manualTotal==null?'':toNumber_(raw.manualTotal), manualTotalReason:safeText_(raw.manualTotalReason)
   };
 }
@@ -67,11 +70,13 @@ function recalculateOrderTotals(order){
   const days=rentalDays_(order.fromDate,order.toDate);
   let itemsSubtotal=0; (order.cart||[]).forEach(l=>{ const it=map[l.id]; if(it) itemsSubtotal += (Number(it.day)||0)*(Number(l.qty)||0)*days; });
   const service = normalizeService(order.service);
+  const hasTentHelperChoice=String(order.tentHelper||'').trim()!=='';
   let deliveryCost=Math.max(0,toNumber_(order.deliveryCost)); let laborCost=Math.max(0,toNumber_(order.laborCost));
   if(service==='abholung') deliveryCost=0;
-  if(service==='all_inclusive') laborCost=calculateLaborCost_(order, itemsSubtotal);
+  if(service==='all_inclusive') { if(hasTentHelperChoice) laborCost=calculateLaborCost_(order); }
+  else laborCost=0;
   const total = (order.manualTotal!==''&&order.manualTotal!=null) ? Math.max(0,toNumber_(order.manualTotal)) : (itemsSubtotal+deliveryCost+laborCost);
-  order.service=service; order.serviceLabel=serviceLabel(service); order.itemsSubtotal=round2_(itemsSubtotal); order.deliveryCost=round2_(deliveryCost); order.laborCost=round2_(laborCost); order.total=round2_(total);
+  order.service=service; order.serviceLabel=serviceLabel(service); order.tentHelper=hasTentHelperChoice?normalizeTentHelper_(order.tentHelper):''; order.tentHelperLabel=laborCost>0&&hasTentHelperChoice?tentHelperLabel_(order.tentHelper):''; order.itemsSubtotal=round2_(itemsSubtotal); order.deliveryCost=round2_(deliveryCost); order.laborCost=round2_(laborCost); order.total=round2_(total);
   return order;
 }
 
@@ -187,6 +192,7 @@ function buildInvoicePreview_(order, previewNo){
   const invoiceNo = previewNo || order.invoiceNo || 'BV-UNSET';
   const lines = ['Rechnungsnr: '+invoiceNo, 'Service: '+serviceLabel(order.service), 'Artikel: '+toNumber_(order.itemsSubtotal).toFixed(2)+' €'];
   if (normalizeService(order.service)!=='abholung' && toNumber_(order.deliveryCost)>0) lines.push('Lieferkosten: '+toNumber_(order.deliveryCost).toFixed(2)+' €');
+  if (order.tentHelperLabel) lines.push('Zelt-Helfer: '+order.tentHelperLabel);
   if (toNumber_(order.laborCost)>0) lines.push('Lohnkosten: '+toNumber_(order.laborCost).toFixed(2)+' €');
   lines.push('Gesamt: '+toNumber_(order.total).toFixed(2)+' €');
   if (VAT_RATE===0) lines.push('Hinweis: Gemäß §19 UStG wird keine Umsatzsteuer berechnet.');
@@ -196,7 +202,7 @@ function sendInvoice_(order, manual, invoiceNo){ const body=buildInvoicePreview_
 function sendOwnerRequestMail_(order){ MailApp.sendEmail(Session.getActiveUser().getEmail(),'Neue Anfrage '+order.orderId,'Bitte bestätigen: ?confirm='+order.orderId+'\nOder ablehnen: ?decline='+order.orderId); }
 
 function getServerItems_(){ return [{id:'zelt_4x12',day:80},{id:'zelt_4x6',day:30},{id:'zelt_5x6',day:40},{id:'garnitur_70x220',day:10},{id:'stehtisch_70',day:5}]; }
-function getOrdersSheet_(){ const props=PropertiesService.getScriptProperties(); let id=props.getProperty('ORDERS_SHEET_ID'); let ss=null; if(id){ ss=SpreadsheetApp.openById(id); } else { try{ss=SpreadsheetApp.getActiveSpreadsheet();}catch(e){ss=null;} if(!ss) ss=SpreadsheetApp.create('BensonVerleihe-Auftraege'); props.setProperty('ORDERS_SHEET_ID', ss.getId()); } let sh=ss.getSheetByName(ORDER_SHEET_NAME); if(!sh){ sh=ss.insertSheet(ORDER_SHEET_NAME); sh.appendRow(ORDER_COLUMNS); } return sh; }
+function getOrdersSheet_(){ const props=PropertiesService.getScriptProperties(); let id=props.getProperty('ORDERS_SHEET_ID'); let ss=null; if(id){ ss=SpreadsheetApp.openById(id); } else { try{ss=SpreadsheetApp.getActiveSpreadsheet();}catch(e){ss=null;} if(!ss) ss=SpreadsheetApp.create('BensonVerleihe-Auftraege'); props.setProperty('ORDERS_SHEET_ID', ss.getId()); } let sh=ss.getSheetByName(ORDER_SHEET_NAME); if(!sh) sh=ss.insertSheet(ORDER_SHEET_NAME); if(sh.getMaxColumns()<ORDER_COLUMNS.length) sh.insertColumnsAfter(sh.getMaxColumns(),ORDER_COLUMNS.length-sh.getMaxColumns()); const headers=sh.getRange(1,1,1,ORDER_COLUMNS.length).getValues()[0]; if(ORDER_COLUMNS.some((name,i)=>headers[i]!==name)) sh.getRange(1,1,1,ORDER_COLUMNS.length).setValues([ORDER_COLUMNS]); return sh; }
 function saveOrder_(order){ const sh=getOrdersSheet_(); const data=sh.getDataRange().getValues(); const idx=data.findIndex((r,i)=>i>0&&r[0]===order.orderId); const row=ORDER_COLUMNS.map(c=>c==='cartJson'?JSON.stringify(order.cart||[]):c==='unknownItemsJson'?JSON.stringify(order.unknownItems||[]):(order[c]||'')); if(idx>0) sh.getRange(idx+1,1,1,row.length).setValues([row]); else sh.appendRow(row); }
 function listOrders_(){ const rows=getOrdersSheet_().getDataRange().getValues(); return rows.slice(1).map(r=>rowToOrder_(r)); }
 function getOrderById_(id){ const o=listOrders_().find(x=>x.orderId===id); if(!o) throw new Error('Auftrag nicht gefunden'); return o; }
@@ -206,7 +212,12 @@ function deleteInvoiceQueueForOrder_(orderId){ const p=PropertiesService.getScri
 
 function getMinimumValueWarning_(order){ try{ enforceMinimumValueForPublicOrder_(order); return ''; }catch(e){ return e.message; } }
 function isLocalCity_(city){ const s=String(city||'').toLowerCase(); return s.indexOf('bienenbüttel')>=0 || s.indexOf('29553 bienenbüttel')>=0; }
-function calculateLaborCost_(order, itemsSubtotal){ return round2_(Math.max(0, rentalDays_(order.fromDate,order.toDate)*25)); }
+function calculateLaborCost_(order){
+  const rates={setup_and_teardown:40,setup_only:60,none:80};
+  const mode=normalizeTentHelper_(order.tentHelper);
+  const tentQty=(order.cart||[]).reduce((sum,line)=>sum+(String(line.id||'').indexOf('zelt_')===0?Math.max(0,toNumber_(line.qty)):0),0);
+  return round2_(tentQty*rates[mode]);
+}
 function generateOrderId_(){ return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMddHHmmss')+'-'+Math.floor(Math.random()*1000); }
 function normalizeDate_(v){ const s=String(v||'').trim(); return /^\d{4}-\d{2}-\d{2}$/.test(s)?s:''; }
 function sanitizeEmail_(v){ const s=String(v||'').trim(); return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s)?s:''; }
